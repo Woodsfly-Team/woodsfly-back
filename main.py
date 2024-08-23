@@ -1,20 +1,11 @@
-import sys
-import os
-
-# 获取项目的根路径
-project_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-# 将项目根路径添加到 sys.path
-if project_path not in sys.path:
-    sys.path.append(project_path)
-
-
+import uvicorn
 from typing import List
  
 from fastapi import Depends, FastAPI, HTTPException,Response
 from sqlalchemy.orm import Session
  
-from woodsflydb_app import crud, models, schemas
-from woodsflydb_app.database import SessionLocal, engine
+import crud, models, schemas
+from database import SessionLocal, engine
  
 #预先创建数据表
 models.Base.metadata.create_all(bind=engine)
@@ -120,7 +111,3 @@ def search_bird(bird_info: str,tag: int,db: Session = Depends(get_db)):
 #     result = crud.delete_item_by_ownerId2(db, owner_id=owner_id)
 #     return result
  
- 
-if __name__ == '__main__':
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
  
-from . import models, schemas
+import models, schemas
  
 #搜素鸟类
 def search_bird(db: Session, bird_info: str):

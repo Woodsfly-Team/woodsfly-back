@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, TIMESTAMP,VARCHAR
 from sqlalchemy.orm import relationship
 #1.用Base类来创建 SQLAlchemy 模型
-from .database import Base
+from database import Base
  
 # class User(Base):
 #     __tablename__ = "users"
