@@ -7,11 +7,6 @@ jobs :
     runs-on: ubuntu-latest
     steps:
 
-    - name: show_info
-      run: |
-        pwd
-        ls
-
     - name: server_git_pull
       uses: garygrossgarten/github-action-ssh@release
       with:
