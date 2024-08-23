@@ -1,0 +1,14 @@
+on: push
+
+jobs :
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+    - name: server_git_pull
+      uses: garygrossgarten/github-action-ssh@release
+      with:
+        command: ./start_server.sh
+        host: ${{ secrets.HOST_NAME}}
+        username: root
+        port: 22
+        privateKey: ${{ secrets.PRIVATE_KEY}}
