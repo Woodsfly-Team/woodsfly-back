@@ -1,11 +1,16 @@
+import uvicorn
+
+from typing import List
  
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException,Response
 from sqlalchemy.orm import Session
+ 
+import crud, models, schemas
 from database import SessionLocal, engine
 
-import crud
-import models
-import schemas
+from yolov8_inference import yolov8_inference
+from encode_and_decode import encode_image_to_base64,decode_base64_to_image
+
 #预先创建数据表
 models.Base.metadata.create_all(bind=engine)
  
@@ -19,16 +24,51 @@ def get_db():
         yield db
     finally:
         db.close()
-# 查询鸟类
+
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+# 创建用户接口
+@app.post("/createuser/")
+def create_user(username:str,password:str,db: Session = Depends(get_db)):
+    if username == None or password == None:#参数错误
+        custom_response = schemas.CustomResponse(code=400, message="用户名或密码不能为空", data=None)
+        return custom_response
+    if crud.get_username_exist(db,username) == True:#用户名已存在
+        custom_response = schemas.CustomResponse(code=404, message="用户名已存在", data=None)
+        return custom_response
+    orm_result = crud.create_user(db=db,username=username,password=password ) # 创建用户
+    pyd_user = schemas.User(
+        avatar=orm_result.avatar,
+        user_id=orm_result.id,
+        username=orm_result.username
+        )
+    custom_response = schemas.CustomResponse(code=200, message="成功创建用户", data=pyd_user)
+    return custom_response
+
+# 查询接口
 @app.post("/searchbird/")
-def search_bird(bird_info: str,tag: int,db: Session = Depends(get_db)):
+def search_bird(bird_info: str,tag: int,user_id: int,db: Session = Depends(get_db)):
+    if crud.get_user_id_exist(db,user_id) == False:#用户不存在
+        custom_response = schemas.CustomResponse(code=404, message="用户不存在", data=None)
+        return custom_response
     if bird_info == None or tag not in [0,1,2]:#参数错误
         custom_response = schemas.CustomResponse(code=400, message="参数错误", data=None)
         return custom_response
-    orm_result = crud.search_bird(db,bird_info)
+    
+    if tag == 0: #字段搜索
+        bird_name = bird_info
+    elif tag == 1: #图片搜索
+        bird_image = decode_base64_to_image(bird_info)
+        bird_name = yolov8_inference(bird_image)
+    elif tag == 2:  #录音搜索
+        bird_name = bird_info
+        
+    orm_result = crud.search_bird(db,bird_name)
     if orm_result == []:#找不到
         custom_response = schemas.CustomResponse(code=404, message="未找到鸟类", data=None)
         return custom_response
+    crud.create_browse(db,user_id,orm_result.id) # 创建浏览记录
     pyd_result = schemas.Response_Search_Bird(
         chinese_name=orm_result.chinese_name,
         define=schemas.Define(bird_family=orm_result.bird_family,bird_genus=orm_result.bird_genus,bird_order=orm_result.bird_order),
@@ -42,31 +82,23 @@ def search_bird(bird_info: str,tag: int,db: Session = Depends(get_db)):
     custom_response = schemas.CustomResponse(code=200, message="成功", data=pyd_result)
     return custom_response
 
-@app.get("/")
-def test():
-    return "hello world"
- 
-# @app.post("/searchbird/")
-# def search_bird(bird_info: str,tag: int,db: Session = Depends(get_db)):
-#     if bird_info == None or tag not in [0,1,2]:#参数错误
-#         custom_response = schemas.CustomResponse(code=400, message="参数错误", data=None)
-#         return custom_response
-#     orm_results = crud.search_bird(db,bird_info)
-#     if orm_results == []:#找不到
-#         custom_response = schemas.CustomResponse(code=404, message="未找到鸟类", data=None)
-#         return custom_response
-#     pyd_results = [schemas.Response_Search_Bird(
-#         chinese_name=orm_result.chinese_name,
-#         define=schemas.Define(bird_family=orm_result.bird_family,bird_genus=orm_result.bird_genus,bird_order=orm_result.bird_order),
-#         english_name=orm_result.english_name,
-#         habitat=orm_result.distrbution,
-#         image=orm_result.image_link,
-#         link=orm_result.baidu_link,
-#         introduction=orm_result.introduction,
-#         level=orm_result.protection_level
-#     ) for orm_result in orm_results]
-#     custom_response = schemas.CustomResponse(code=200, message="成功", data=pyd_results)
-#     return custom_response
+# 搜索匹配接口 
+@app.post("/matchinfo/")
+def search_bird(bird_info: str,db: Session = Depends(get_db)):
+    if bird_info == None:#参数错误
+        custom_response = schemas.CustomResponse(code=400, message="参数错误", data=None)
+        return custom_response
+    orm_results = crud.search_birds(db,bird_info)
+    if orm_results == []:#找不到
+        custom_response = schemas.CustomResponse(code=404, message="未找到鸟类", data=None)
+        return custom_response
+    pyd_results = [schemas.Response_Matchinfo(
+        chinese_name=orm_result.chinese_name,
+        english_name=orm_result.english_name,
+        define=schemas.Define(bird_family=orm_result.bird_family,bird_genus=orm_result.bird_genus,bird_order=orm_result.bird_order)
+    ) for orm_result in orm_results]
+    custom_response = schemas.CustomResponse(code=200, message="成功", data=pyd_results)
+    return custom_response
 
 # @app.post("/users/", response_model=schemas.User)
 # def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -113,4 +145,5 @@ def test():
 # def delete_item(owner_id: int, db: Session = Depends(get_db)):
 #     result = crud.delete_item_by_ownerId2(db, owner_id=owner_id)
 #     return result
+ 
  

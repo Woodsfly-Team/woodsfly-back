@@ -1,5 +1,6 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, TIMESTAMP,VARCHAR
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 #1.用Base类来创建 SQLAlchemy 模型
 from database import Base
  
@@ -23,7 +24,7 @@ from database import Base
  
 #     owner = relationship("User", back_populates="items")
 
-class User(Base):
+class User(Base):# 用户表
     __tablename__ = "user"
     #2.创建模型属性/列
     id = Column(Integer, primary_key=True, index=True)
@@ -31,7 +32,7 @@ class User(Base):
     password = Column(String(50))
     avatar = Column(String(100))
 
-class Bird(Base):
+class Bird(Base):# 鸟类表
     __tablename__ = "bird"
     #2.创建模型属性/列
     id = Column(Integer, primary_key=True, index=True)
@@ -46,17 +47,17 @@ class Bird(Base):
     distrbution = Column(String(100))
     image_link = Column(String(100))
 
-class Browse(Base):
+class Browse(Base):# 浏览记录表
     __tablename__ = "browse"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer)
     bird_id = Column(Integer)
-    browse_time = Column(TIMESTAMP(6))
+    browse_time = Column(TIMESTAMP(6),server_default=func.current_timestamp(6))
 
-class Collect(Base):
+class Collect(Base):# 收藏表
     __tablename__ = "collect"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer)
     bird_id = Column(Integer)
-    collect_time = Column(TIMESTAMP(6))
+    collect_time = Column(TIMESTAMP(6),server_default=func.current_timestamp(6))
 
