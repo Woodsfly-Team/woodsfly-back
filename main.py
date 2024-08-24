@@ -1,12 +1,11 @@
-import uvicorn
-from typing import List
  
-from fastapi import Depends, FastAPI, HTTPException,Response
+from fastapi import Depends, FastAPI
 from sqlalchemy.orm import Session
- 
-import crud, models, schemas
 from database import SessionLocal, engine
- 
+
+import crud
+import models
+import schemas
 #预先创建数据表
 models.Base.metadata.create_all(bind=engine)
  
@@ -42,6 +41,10 @@ def search_bird(bird_info: str,tag: int,db: Session = Depends(get_db)):
         ) 
     custom_response = schemas.CustomResponse(code=200, message="成功", data=pyd_result)
     return custom_response
+
+@app.get("/")
+def test():
+    return "hello world"
  
 # @app.post("/searchbird/")
 # def search_bird(bird_info: str,tag: int,db: Session = Depends(get_db)):
