@@ -26,11 +26,11 @@ def get_db():
         db.close()
 
 @app.get("/")
-def read_root():
-    return {"Hello": "World"}
+async def read_root():
+    return {"Hello":"World"}
 # 创建用户接口
 @app.post("/createuser/")
-def create_user(username:str,password:str,db: Session = Depends(get_db)):
+async def create_user(username:str,password:str,db: Session = Depends(get_db)):
     if username == None or password == None:#参数错误
         custom_response = schemas.CustomResponse(code=400, message="用户名或密码不能为空", data=None)
         return custom_response
@@ -48,7 +48,7 @@ def create_user(username:str,password:str,db: Session = Depends(get_db)):
 
 # 查询接口
 @app.post("/searchbird/")
-def search_bird(bird_info: str,tag: int,user_id: int,db: Session = Depends(get_db)):
+async def search_bird(bird_info: str,tag: int,user_id: int,db: Session = Depends(get_db)):
     if crud.get_user_id_exist(db,user_id) == False:#用户不存在
         custom_response = schemas.CustomResponse(code=404, message="用户不存在", data=None)
         return custom_response
@@ -84,7 +84,7 @@ def search_bird(bird_info: str,tag: int,user_id: int,db: Session = Depends(get_d
 
 # 搜索匹配接口 
 @app.post("/matchinfo/")
-def search_bird(bird_info: str,db: Session = Depends(get_db)):
+async def search_bird(bird_info: str,db: Session = Depends(get_db)):
     if bird_info == None:#参数错误
         custom_response = schemas.CustomResponse(code=400, message="参数错误", data=None)
         return custom_response
