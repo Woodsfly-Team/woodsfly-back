@@ -1,3 +1,13 @@
 /yolov8x_brid_0818.pt
 /user_data
 /__pycache__
+/BirdClass/__pycache__
+/BirdClass/.idea/
+/BirdClass/build/
+/BirdClass/dist/
+
+/BirdClass/log/
+/BirdClass/output/
+/BirdClass/models/
+/BirdClass/pretrained_models/
+/BirdClass/feature_models/
