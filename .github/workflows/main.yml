@@ -10,7 +10,7 @@ jobs :
     - name: server_git_pull
       uses: garygrossgarten/github-action-ssh@release
       with:
-        command: ./start_server.sh
+        command: ./cd_pull.sh
         host: ${{ secrets.HOST_NAME }}
         username: root
         port: 22
