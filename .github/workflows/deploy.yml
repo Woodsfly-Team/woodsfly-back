@@ -1,3 +1,5 @@
+name: FastAPI Deploy
+
 on:
   push:
     branches: [ main ]
