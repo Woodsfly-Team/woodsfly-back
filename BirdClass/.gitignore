@@ -2,7 +2,6 @@ __pycache__/
 .idea/
 build/
 dist/
-macls.egg-info/
 dataset/
 log/
 output/
