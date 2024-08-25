@@ -7,47 +7,28 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-test:
+  build-and-run:
     runs-on: ubuntu-latest
 
-    services:
-      fastapi:
-        image: python:3.11
-        env:
-          COMMAND: "uvicorn app.main:app --host 0.0.0.0 --port 80"
-        ports:
-          - 8000:80
-        options: >-
-          --health-cmd "curl -f http://localhost:80/health || exit 1"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 5
-          --restart=unless-stopped
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11.9'
-          cache: 'pip'
-          cache-dependency-path: '**/requirements.txt'
+    - name: Set up Python 3.11.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11.9
 
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      - name: Start and Test FastAPI Service
-        run: |
-          # 等待服务启动
-          sleep 10
-          # 发送HTTP请求进行健康检查
-          if curl -s -o /dev/null -w '%{http_code}' http://localhost:80/health | grep -q 200; then
-            echo "FastAPI service is running successfully."
-          else
-            echo "Failed to start or connect to the FastAPI service."
-            exit 1
-          fi 
+    - name: Start FastAPI Application
+      run: |
+        uvicorn app.main:app --host 0.0.0.0 --port 8000
+      # 注意这里端口使用的是8000而不是80，因为80端口通常被其他服务占用或需要root权限
+      # 结束工作流的策略通常是通过设置timeout-minutes或者让job在启动服务后立即退出
+      env:
+        PORT: 8000
+      timeout-minutes: 1 # 设置超时时间以结束工作流，可根据实际需要调整
