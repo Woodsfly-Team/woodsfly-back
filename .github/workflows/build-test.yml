@@ -28,7 +28,7 @@ jobs:
 
     - name: Start FastAPI Application
       run: |
-        uvicorn app.main:app --host 0.0.0.0 --port 8000
+        uvicorn main:app --host 0.0.0.0 --port 8000
       # 注意这里端口使用的是8000而不是80，因为80端口通常被其他服务占用或需要root权限
       # 结束工作流的策略通常是通过设置timeout-minutes或者让job在启动服务后立即退出
       env:
