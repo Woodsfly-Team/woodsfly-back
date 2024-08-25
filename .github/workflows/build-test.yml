@@ -28,7 +28,7 @@ jobs:
 
     - name: Start FastAPI Application
       run: |
-        nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+        nohup uvicorn main:app --host 0.0.0.0 --port 8000
         echo "Server started, waiting for it to be ready..."
         sleep 10 # 等待一段时间确保服务器已准备好接收请求
       env:
