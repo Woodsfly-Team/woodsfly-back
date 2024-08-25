@@ -50,4 +50,4 @@ jobs:
           else
             echo "Failed to start or connect to the FastAPI service."
             exit 1
-          fi
+          fi 
