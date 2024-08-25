@@ -18,6 +18,8 @@ def yolov8_inference(source):
         # obb = result.obb  # Oriented boxes object for OBB outputs
         # result.show()  # display to screen
         # result.save(filename="result.jpg")  # save to disk
+    if boxes.cls.numel() == 0:
+        return None
     return result.names[boxes.cls.item()]
     
     

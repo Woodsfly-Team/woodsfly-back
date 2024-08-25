@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, TIMESTAMP,VARCHAR
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, TIMESTAMP,VARCHAR,Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 #1.用Base类来创建 SQLAlchemy 模型
@@ -45,7 +45,7 @@ class Bird(Base):# 鸟类表
     introduction = Column(String(500))
     baidu_link = Column(String(100))
     distrbution = Column(String(100))
-    image_link = Column(String(100))
+    image_link = Column(Text)
 
 class Browse(Base):# 浏览记录表
     __tablename__ = "browse"

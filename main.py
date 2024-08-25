@@ -92,6 +92,9 @@ async def search_bird(bird_info: str,tag: int,user_id: int,db: Session = Depends
     elif tag == 2:  #录音搜索
         bird_name = bird_info
         
+    if bird_name == None:#找不到
+        custom_response = schemas.CustomResponse(code=404, message="未找到鸟类", data=None)
+        return custom_response
     orm_result = crud.search_bird(db,bird_name)
     if orm_result == []:#找不到
         custom_response = schemas.CustomResponse(code=404, message="未找到鸟类", data=None)
