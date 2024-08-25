@@ -4,9 +4,11 @@ import models, schemas
  
 #搜素鸟类（单结果）
 def search_bird(db: Session, bird_info: str):
-    orm_result = db.query(models.Bird).filter(models.Bird.english_name == bird_info).first()
-    if orm_result:
-        return orm_result
+    attributes = ['chinese_name', 'english_name']
+    for attr in attributes:
+        orm_result = db.query(models.Bird).filter(getattr(models.Bird, attr)== bird_info).first()
+        if orm_result:
+            return orm_result
     return []
 #搜索鸟类（多结果）
 def search_birds(db: Session, bird_info: str):

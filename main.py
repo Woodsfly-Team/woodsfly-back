@@ -2,7 +2,8 @@ import uvicorn
 
 from typing import List
  
-from fastapi import Depends, FastAPI, HTTPException,Response
+from fastapi import Depends, FastAPI,HTTPException,Response,UploadFile,File
+from fastapi.responses import HTMLResponse,FileResponse
 from sqlalchemy.orm import Session
  
 import crud, models, schemas
@@ -25,10 +26,34 @@ def get_db():
     finally:
         db.close()
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def read_root():
-    result = encode_image_to_base64('dujuan.png')
-    return {'base64': result}
+    html_content = """
+     <!DOCTYPE html>
+    <html>
+        <head>
+            <title>FastAPI HTMLResponse Example</title>
+        </head>
+        <body>
+            <h1>Hello, World!</h1>
+        </body>
+    </html>
+    """
+    return html_content
+
+app = FastAPI()
+
+
+@app.post("/image/")
+async def get_image(file:UploadFile = File(...)):
+    with open(file.filename, "wb") as buffer:
+        buffer.write(await file.read())
+    return {'ok':'ok'}
+
+@app.get("/audio/")
+async def get_audio():
+    return FileResponse("516341.wav", media_type="wav")
+
 # 创建用户接口
 @app.post("/createuser/")
 async def create_user(username:str,password:str,db: Session = Depends(get_db)):
