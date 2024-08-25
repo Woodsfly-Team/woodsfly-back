@@ -23,7 +23,7 @@ from encode_and_decode import encode_image_to_base64,decode_base64_to_image,enco
 models.Base.metadata.create_all(bind=engine)
  
 app = FastAPI()
-# Dependency
+# 数据库连接
 def get_db():
     db = SessionLocal()
     try:
@@ -31,22 +31,24 @@ def get_db():
     finally:
         db.close()
 
+# 静态资源
 app.mount("/assets", StaticFiles(directory="2125_artxibition/assets"), name="static")
 
+# 测试接口
 @app.get("/test")
 async def test():
     return "server is running"
-
+# 首页接口
 @app.get("/")
 async def read_index():
     return FileResponse("2125_artxibition/index.html")
-
+# 图片接口
 @app.post("/image/")
 async def get_image(file:UploadFile = File(...)):
     with open(file.filename, "wb") as buffer:
         buffer.write(await file.read())
     return {'ok':'ok'}
-
+# 音频接口
 @app.get("/audio/")
 async def get_audio():
     return FileResponse("516341.wav", media_type="wav")
