@@ -12,7 +12,7 @@ jobs:
 
     services:
       fastapi:
-        image: python:3.11.9
+        image: python:3.11.9-bookworm
         env:
           COMMAND: "uvicorn app.main:app --host 0.0.0.0 --port 80"
         ports:
