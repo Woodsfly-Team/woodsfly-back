@@ -1,12 +1,11 @@
-import uvicorn
 
-from typing import List
- 
-from fastapi import Depends, FastAPI,HTTPException,Response,UploadFile,File
-from fastapi.responses import HTMLResponse,FileResponse
+from fastapi import Depends, FastAPI,UploadFile,File
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
  
-import crud, models, schemas
+import crud
+import models
+import schemas
 from database import SessionLocal, engine
 
 from yolov8_inference import yolov8_inference
@@ -32,6 +31,9 @@ app = FastAPI()
 async def test():
     return "server is running"
 
+@app.get("/")
+async def read_index():
+    return FileResponse("2125_artxibition\index.html")
 
 @app.post("/image/")
 async def get_image(file:UploadFile = File(...)):
