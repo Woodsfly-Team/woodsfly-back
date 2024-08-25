@@ -26,20 +26,9 @@ def get_db():
     finally:
         db.close()
 
-@app.get("/")
-async def read_root():
-    html_content = """
-     <!DOCTYPE html>
-    <html>
-        <head>
-            <title>FastAPI HTMLResponse Example</title>
-        </head>
-        <body>
-            <h1>Hello, World!</h1>
-        </body>
-    </html>
-    """
-    return html_content
+@app.get("/test")
+async def test():
+    return "server is running"
 
 app = FastAPI()
 
