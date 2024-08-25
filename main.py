@@ -27,7 +27,7 @@ def get_db():
 
 @app.get("/")
 async def read_root():
-    result = decode_base64_to_image('dujuan.png')
+    result = encode_image_to_base64('dujuan.png')
     return {'base64': result}
 # 创建用户接口
 @app.post("/createuser/")
