@@ -13,11 +13,11 @@ dataset_conf:
   # 对音频进行音量归一化的音量分贝值
   target_dB: -20
   # 训练数据的数据列表路径
-  train_list: 'dataset/train_list.txt'
+  train_list: 'BirdClass/dataset/train_list.txt'
   # 测试数据的数据列表路径
-  test_list: 'dataset/test_list.txt'
+  test_list: 'BirdClass/dataset/test_list.txt'
   # 标签列表
-  label_list_path: 'dataset/label_list.txt'
+  label_list_path: 'BirdClass/dataset/label_list.txt'
   # 评估的数据要特殊处理
   eval_conf:
     # 评估的批量大小
@@ -41,7 +41,7 @@ dataset_conf:
     # 音量增强概率
     volume_aug_prob: 0.2
     # 噪声增强的噪声文件夹
-    noise_dir: 'dataset/noise'
+    noise_dir: 'BirdClass/dataset/noise'
     # 噪声增强概率
     noise_aug_prob: 0.2
   # 是否使用SpecAug

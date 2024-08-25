@@ -40,7 +40,7 @@ async def is_running():
 # 测试接口
 @app.get("/test")
 async def test():
-    lable = await infer('BirdClass/configs/resnet_se.yml',False,'user_data/516341.wav','BirdClass/models/ResNetSE_Fbank/best_model/')
+    lable = infer('BirdClass/configs/resnet_se.yml',False,'user_data/516341.wav','BirdClass/models/ResNetSE_Fbank/best_model/')
     return lable
 
 
