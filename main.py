@@ -27,7 +27,8 @@ def get_db():
 
 @app.get("/")
 async def read_root():
-    return {"Hello":"World"}
+    result = decode_base64_to_image('dujuan.png')
+    return {'base64': result}
 # 创建用户接口
 @app.post("/createuser/")
 async def create_user(username:str,password:str,db: Session = Depends(get_db)):
