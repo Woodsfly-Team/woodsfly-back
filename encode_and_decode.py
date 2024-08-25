@@ -22,11 +22,13 @@ def encode_image_to_base64(image_path):
 # print(encoded_image)
 
 def decode_base64_to_image(base64_string,user_id):
-    # length = len(base64_string)
-    # if(length%3 == 1): 
-    #     base64_string += "=="
-    # elif(length%3 == 2): 
-    #     base64_string += "=" 
+    length = len(base64_string)
+    if(length%3 == 0): 
+        pass
+    elif(length%3 == 1): 
+        base64_string += "=="
+    elif(length%3 == 2): 
+        base64_string += "=" 
     # 将Base64编码的字符串转换为字节
     base64_string = base64_string.replace(' ','+')
     # print(base64_string)
