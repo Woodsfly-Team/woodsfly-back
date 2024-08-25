@@ -21,8 +21,6 @@
    在本地拉取最新的项目代码，切换到 `dev` 分支，新建一个分支 `example`。
 
    ```bash
-   # 切换到 dev 分支
-   git checkout dev
    # 拉取最新代码
    git pull
    # 新建分支
@@ -46,7 +44,7 @@
 
 3. 提交 Pull Request
 
-   提交 Pull Request 从 `examplbranch` 到 `dev` 分支。在 Pull Request 中，请确保你的代码通过了所有的测试，没有任何冲突。在 Pull Request 中，请详细描述你的修改，以及你的修改如何解决了问题。
+   提交 Pull Request 从 `examplbranch` 到 `main` 分支。在 Pull Request 中，请确保你的代码通过了所有的测试，没有任何冲突。在 Pull Request 中，请详细描述你的修改，以及你的修改如何解决了问题。
 
    你需要请求一位其他人员来 code review 你的代码。
 
@@ -54,6 +52,6 @@
 
 4. 合并 Pull Request
 
-   当你的 Pull Request 被授权后，你可以将你的代码合并到 `dev` 分支。在合并之前，请确保你的代码没有任何冲突，也没有任何测试失败。合并完成后，你可以安全地删除分支 `examplebranch`。
+   当你的 Pull Request 被授权后，你可以将你的代码合并到 `main` 分支。在合并之前，请确保你的代码没有任何冲突，也没有任何测试失败。合并完成后，你可以安全地删除分支 `examplebranch`。
 
-   **请注意：严格禁止直接 push 到 `dev` 分支**
+   **请注意：严格禁止直接 push 到 `main` 分支**
