@@ -1,16 +1,24 @@
 from ultralytics import YOLO
 
-
 # Load a pretrained YOLOv8n model
-model = YOLO("yolov8s_0820.pt")
+model = YOLO("yolov8x_brid_0818.pt")
+
 
 
 def yolov8_inference(source):
-
+    
     # Run inference on the source
     results = model.predict(source, conf=0.4,iou=0.7,max_det=10,imgsz=640)  # list of Results objects
-    boxes = results[0].boxes
-    return results[0].names[boxes.cls.item()]
+    # Process results list
+    for result in results:
+        boxes = result.boxes  # Boxes object for bounding box outputs
+        # masks = result.masks  # Masks object for segmentation masks outputs
+        # keypoints = result.keypoints  # Keypoints object for pose outputs
+        # probs = result.probs  # Probs object for classification outputs
+        # obb = result.obb  # Oriented boxes object for OBB outputs
+        # result.show()  # display to screen
+        # result.save(filename="result.jpg")  # save to disk
+    return result.names[boxes.cls.item()]
     
     
 

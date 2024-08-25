@@ -59,8 +59,10 @@ async def search_bird(bird_info: str,tag: int,user_id: int,db: Session = Depends
     if tag == 0: #字段搜索
         bird_name = bird_info
     elif tag == 1: #图片搜索
-        bird_image = decode_base64_to_image(bird_info)
-        bird_name = yolov8_inference(bird_image)
+        # bird_info = encode_image_to_base64('maque.png')
+        image_path = decode_base64_to_image(bird_info,user_id)
+        bird_name = yolov8_inference(image_path)
+        print(bird_name)
     elif tag == 2:  #录音搜索
         bird_name = bird_info
         

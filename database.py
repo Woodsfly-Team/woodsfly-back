@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
  
 #2.为 SQLAlchemy 定义数据库 URL地址
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://woodsflyDB:77528888@101.200.79.106:3306/woodsflydb?charset=utf8mb4"
+SQLALCHEMY_DATABASE_URL = "mysql+pymysql://woodsflyDB:77528888@59.110.123.151:3306/woodsflydb?charset=utf8mb4"
  
 #3.创建 SQLAlchemy 引擎
 engine = create_engine( SQLALCHEMY_DATABASE_URL )
