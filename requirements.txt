@@ -5,3 +5,4 @@ SQLAlchemy==2.0.32
 ultralytics==8.2.81
 uvicorn==0.30.6
 pymysql==1.1.1
+python-multipart
