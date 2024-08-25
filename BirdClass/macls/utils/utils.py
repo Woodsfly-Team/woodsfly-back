@@ -4,7 +4,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-from macls.utils.logger import setup_logger
+from BirdClass.macls.utils.logger import setup_logger
 
 logger = setup_logger(__name__)
 
