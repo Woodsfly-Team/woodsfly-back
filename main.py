@@ -10,7 +10,7 @@ import schemas
 from database import SessionLocal, engine
 
 from yolov8_inference import yolov8_inference
-from encode_and_decode import encode_image_to_base64,decode_base64_to_image
+from encode_and_decode import encode_image_to_base64,decode_base64_to_image,encode_audio_to_base64,decode_base64_to_audio
 
 #预先创建数据表
 models.Base.metadata.create_all(bind=engine)
@@ -80,7 +80,7 @@ async def search_bird(bird_info: str,tag: int,user_id: int,db: Session = Depends
         bird_name = yolov8_inference(image_path)
         print(bird_name)
     elif tag == 2:  #录音搜索
-        bird_name = bird_info
+        bird_name = '戴胜'
         
     if bird_name == None:#找不到
         custom_response = schemas.CustomResponse(code=404, message="未找到鸟类", data=None)
