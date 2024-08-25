@@ -35,7 +35,7 @@ jobs:
     - name: Test FastAPI Application
       run: |
         # 发送GET请求并检查响应状态
-        RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/test)
+        RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/is-running)
         if [ "$RESPONSE" -eq 200 ]; then
           echo "Application is running successfully."
           exit 0

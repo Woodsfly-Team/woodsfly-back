@@ -1,4 +1,9 @@
 
+from BirdClass.macls.predict import MAClsPredictor
+from BirdClass.macls.utils.utils import add_arguments, print_arguments
+
+
+
 from fastapi import Depends, FastAPI,UploadFile,File
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -16,7 +21,7 @@ from encode_and_decode import encode_image_to_base64,decode_base64_to_image,enco
 models.Base.metadata.create_all(bind=engine)
  
 app = FastAPI()
-# Dependency
+# 数据库连接
 def get_db():
     db = SessionLocal()
     try:
@@ -24,22 +29,32 @@ def get_db():
     finally:
         db.close()
 
+# 静态资源
 app.mount("/assets", StaticFiles(directory="2125_artxibition/assets"), name="static")
 
-@app.get("/test")
-async def test():
+# 测试接口
+@app.get("/is-running")
+async def is_running():
     return "server is running"
 
+# 测试接口
+@app.get("/test")
+async def test():
+    lable = infer('BirdClass/configs/resnet_se.yml',False,'user_data/516341.wav','BirdClass/models/ResNetSE_Fbank/best_model/')
+    return lable
+
+
+# 首页接口
 @app.get("/")
 async def read_index():
     return FileResponse("2125_artxibition/index.html")
-
+# 图片接口
 @app.post("/image/")
 async def get_image(file:UploadFile = File(...)):
     with open(file.filename, "wb") as buffer:
         buffer.write(await file.read())
     return {'ok':'ok'}
-
+# 音频接口
 @app.get("/audio/")
 async def get_audio():
     return FileResponse("516341.wav", media_type="wav")
@@ -167,4 +182,14 @@ async def search_bird(bird_info: str,db: Session = Depends(get_db)):
 #     result = crud.delete_item_by_ownerId2(db, owner_id=owner_id)
 #     return result
  
- 
+
+def infer(configs: str, use_gpu: bool, audio_path: str, model_path: str):
+    # 获取识别器
+    predictor = MAClsPredictor(configs=configs,
+                            model_path=model_path,
+                            use_gpu=use_gpu)
+
+    label, score = predictor.predict(audio_data=audio_path)
+
+    print(f'音频：{audio_path} 的预测结果标签为：{label}，得分：{score}')
+    return label
