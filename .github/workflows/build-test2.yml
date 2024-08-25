@@ -1,9 +1,10 @@
-name: FastAPI Deployment
+name: FastAPI Build Test
 
 on:
   push:
-    branches:
-      - main  # 或者你希望监控的分支名称
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build-and-test:
@@ -31,6 +32,8 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11.9'
+          cache: 'pip'
+          cache-dependency-path: '**/requirements.txt'
 
       - name: Install dependencies
         run: |
