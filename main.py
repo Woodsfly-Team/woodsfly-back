@@ -1,5 +1,3 @@
-import argparse
-import functools
 
 from BirdClass.macls.predict import MAClsPredictor
 from BirdClass.macls.utils.utils import add_arguments, print_arguments
@@ -35,9 +33,17 @@ def get_db():
 app.mount("/assets", StaticFiles(directory="2125_artxibition/assets"), name="static")
 
 # 测试接口
+@app.get("/is-running")
+async def is_running():
+    return "server is running"
+
+# 测试接口
 @app.get("/test")
 async def test():
-    return "server is running"
+    lable = await infer('BirdClass/configs/resnet_se.yml',False,'user_data/516341.wav','BirdClass/models/ResNetSE_Fbank/best_model/')
+    return lable
+
+
 # 首页接口
 @app.get("/")
 async def read_index():
@@ -176,23 +182,14 @@ async def search_bird(bird_info: str,db: Session = Depends(get_db)):
 #     result = crud.delete_item_by_ownerId2(db, owner_id=owner_id)
 #     return result
  
- 
-def infer():
-    parser = argparse.ArgumentParser(description=__doc__)
-    add_arg = functools.partial(add_arguments, argparser=parser)
-    add_arg('configs',          str,    'configs/resnet_se.yml',   '配置文件')
-    add_arg('use_gpu',          bool,   True,                  '是否使用GPU预测')
-    add_arg('audio_path',       str,    'dataset/audio/woodpecker/629947.wav', '音频路径')
-    add_arg('model_path',       str,    'models/ResNetSE_Fbank/best_model/', '导出的预测模型文件路径')
-    args = parser.parse_args()
-    print_arguments(args=args)
 
+def infer(configs: str, use_gpu: bool, audio_path: str, model_path: str):
     # 获取识别器
-    predictor = MAClsPredictor(configs=args.configs,
-                            model_path=args.model_path,
-                            use_gpu=args.use_gpu)
+    predictor = MAClsPredictor(configs=configs,
+                            model_path=model_path,
+                            use_gpu=use_gpu)
 
-    label, score = predictor.predict(audio_data=args.audio_path)
+    label, score = predictor.predict(audio_data=audio_path)
 
-    print(f'音频：{args.audio_path} 的预测结果标签为：{label}，得分：{score}')
+    print(f'音频：{audio_path} 的预测结果标签为：{label}，得分：{score}')
     return label
