@@ -1,6 +1,7 @@
 
 from fastapi import Depends, FastAPI,UploadFile,File
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
  
 import crud
@@ -15,8 +16,6 @@ from encode_and_decode import encode_image_to_base64,decode_base64_to_image
 models.Base.metadata.create_all(bind=engine)
  
 app = FastAPI()
- 
- 
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -25,15 +24,15 @@ def get_db():
     finally:
         db.close()
 
+app.mount("/assets", StaticFiles(directory="2125_artxibition/assets"), name="static")
 
-app = FastAPI()
 @app.get("/test")
 async def test():
     return "server is running"
 
 @app.get("/")
 async def read_index():
-    return FileResponse("2125_artxibition\index.html")
+    return FileResponse("2125_artxibition/index.html")
 
 @app.post("/image/")
 async def get_image(file:UploadFile = File(...)):
