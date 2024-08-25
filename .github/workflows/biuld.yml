@@ -6,6 +6,7 @@ jobs:
     build:
         runs-on: ubuntu-latest
         steps:
+            
             - name: Checkout
               uses: actions/checkout@v2
 
@@ -16,4 +17,5 @@ jobs:
                 cache: 'pip'
                 cache-dependency-path: '**/requirements.txt'
 
-
+            - name: test server
+              run: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
