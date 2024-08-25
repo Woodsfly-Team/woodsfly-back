@@ -26,11 +26,11 @@ def get_db():
     finally:
         db.close()
 
+
+app = FastAPI()
 @app.get("/test")
 async def test():
     return "server is running"
-
-app = FastAPI()
 
 
 @app.post("/image/")
