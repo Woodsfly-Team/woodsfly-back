@@ -26,7 +26,7 @@ def get_db():
     finally:
         db.close()
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
 async def read_root():
     html_content = """
      <!DOCTYPE html>

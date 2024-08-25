@@ -1,0 +1,47 @@
+name: FastAPI Build Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python 3.11.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11.9
+        cache: 'pip'
+        cache-dependency-path: '**/requirements.txt'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Start FastAPI Application
+      run: |
+        nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
+        echo "Server started, waiting for it to be ready..."
+        sleep 10 # 等待一段时间确保服务器已准备好接收请求
+      env:
+        PORT: 8000
+  
+    - name: Test FastAPI Application
+      run: |
+        # 发送GET请求并检查响应状态
+        RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000)
+        if [ "$RESPONSE" -eq 200 ]; then
+          echo "Application is running successfully."
+          exit 0
+        else
+          echo "Failed to start the application or receive a successful response."
+          exit 1
+        fi
