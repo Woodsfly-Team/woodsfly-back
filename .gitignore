@@ -1,4 +1,4 @@
-/yolov8x_brid_0818.pt
+*.pt
 /user_data
 /__pycache__
 /BirdClass/__pycache__
