@@ -97,6 +97,7 @@ async def search_bird(bird_info: str,tag: int,user_id: int,db: Session = Depends
     elif tag == 2:  #录音搜索
         bird_name = '戴胜'
         
+        
     if bird_name == None:#找不到
         custom_response = schemas.CustomResponse(code=404, message="未找到鸟类", data=None)
         return custom_response
@@ -113,7 +114,8 @@ async def search_bird(bird_info: str,tag: int,user_id: int,db: Session = Depends
         image=orm_result.image_link,
         link=orm_result.baidu_link,
         introduction=orm_result.introduction,
-        level=orm_result.protection_level
+        level=orm_result.protection_level,
+        incidence="99.2%"
         ) 
     custom_response = schemas.CustomResponse(code=200, message="成功", data=pyd_result)
     return custom_response
