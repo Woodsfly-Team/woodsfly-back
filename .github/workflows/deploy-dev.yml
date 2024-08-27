@@ -1,0 +1,20 @@
+name: Deploy dev
+
+on:
+  pull_request:
+    branches: [ dev ]
+    types: [closed]
+
+jobs :
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: server_git_pull
+      uses: garygrossgarten/github-action-ssh@release
+      with:
+        command: ./cd_pull_dev.sh
+        host: ${{ secrets.HOST_NAME }}
+        username: root
+        port: 22
+        privateKey: ${{ secrets.PRIVATE_KEY}}
