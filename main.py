@@ -32,7 +32,7 @@ def get_db():
 # 静态资源
 app.mount("/assets", StaticFiles(directory="2125_artxibition/assets"), name="static")
 
-# 测试接口
+# 测试启动接口
 @app.get("/is-running")
 async def is_running():
     return "server is running"
@@ -42,7 +42,6 @@ async def is_running():
 async def test():
     lable = infer('BirdClass/configs/resnet_se.yml',False,'user_data/516341.wav','BirdClass/models/ResNetSE_Fbank/best_model/')
     return lable
-
 
 # 首页接口
 @app.get("/")
@@ -57,16 +56,13 @@ async def get_image(file:UploadFile = File(...)):
 # 音频接口
 @app.get("/audio/")
 async def get_audio():
-    return FileResponse("516341.wav", media_type="wav")
+    return FileResponse('user_data/516341.wav', media_type="wav")
 
 # 创建用户接口
 @app.post("/createuser/")
 async def create_user(username:str,password:str,db: Session = Depends(get_db)):
-    if username == None or password == None:#参数错误
-        custom_response = schemas.CustomResponse(code=400, message="用户名或密码不能为空", data=None)
-        return custom_response
-    if crud.get_username_exist(db,username) == True:#用户名已存在
-        custom_response = schemas.CustomResponse(code=404, message="用户名已存在", data=None)
+    if crud.get_username_exist(db,username) is True:#用户名已存在
+        custom_response = schemas.CustomResponse(code=400, message="用户名已存在", data=None)
         return custom_response
     orm_result = crud.create_user(db=db,username=username,password=password ) # 创建用户
     pyd_user = schemas.User(
@@ -78,52 +74,19 @@ async def create_user(username:str,password:str,db: Session = Depends(get_db)):
     return custom_response
 
 # 查询接口
-@app.post("/searchbird/")
-async def search_bird(bird_info: str,tag: int,user_id: int,db: Session = Depends(get_db)):
-    if crud.get_user_id_exist(db,user_id) == False:#用户不存在
-        custom_response = schemas.CustomResponse(code=404, message="用户不存在", data=None)
-        return custom_response
-    if bird_info == None or tag not in [0,1,2]:#参数错误
-        custom_response = schemas.CustomResponse(code=400, message="参数错误", data=None)
-        return custom_response
-    
-    if tag == 0: #字段搜索
-        bird_name = bird_info
-    elif tag == 1: #图片搜索
-        # bird_info = encode_image_to_base64('maque.png')
-        image_path = decode_base64_to_image(bird_info,user_id)
-        bird_name = yolov8_inference(image_path)
-        print(bird_name)
-    elif tag == 2:  #录音搜索
-        bird_name = '戴胜'
-        
-        
-    if bird_name == None:#找不到
-        custom_response = schemas.CustomResponse(code=404, message="未找到鸟类", data=None)
-        return custom_response
+@app.get("/search")
+async def search_bird(bird_name: str,db: Session = Depends(get_db)):
     orm_result = crud.search_bird(db,bird_name)
     if orm_result == []:#找不到
         custom_response = schemas.CustomResponse(code=404, message="未找到鸟类", data=None)
         return custom_response
-    crud.create_browse(db,user_id,orm_result.id) # 创建浏览记录
-    pyd_result = schemas.Response_Search_Bird(
-        chinese_name=orm_result.chinese_name,
-        define=schemas.Define(bird_family=orm_result.bird_family,bird_genus=orm_result.bird_genus,bird_order=orm_result.bird_order),
-        english_name=orm_result.english_name,
-        habitat=orm_result.distrbution,
-        image=orm_result.image_link,
-        link=orm_result.baidu_link,
-        introduction=orm_result.introduction,
-        level=orm_result.protection_level,
-        incidence="99.2%"
-        ) 
-    custom_response = schemas.CustomResponse(code=200, message="成功", data=pyd_result)
+    custom_response = schemas.CustomResponse(code=200, message="成功", data=None)
     return custom_response
 
 # 搜索匹配接口 
 @app.post("/matchinfo/")
 async def search_bird(bird_info: str,db: Session = Depends(get_db)):
-    if bird_info == None:#参数错误
+    if bird_info is None:#参数错误
         custom_response = schemas.CustomResponse(code=400, message="参数错误", data=None)
         return custom_response
     orm_results = crud.search_birds(db,bird_info)
