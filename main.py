@@ -24,6 +24,11 @@ import os
 models.Base.metadata.create_all(bind=engine)
  
 app = FastAPI()
+
+#  获取识别器
+predictor = MAClsPredictor(configs='BirdClass/configs/resnet_se.yml',
+                        model_path='BirdClass/models/ResNetSE_Fbank/best_model/',
+                        use_gpu=False)
 # 数据库连接
 def get_db():
     db = SessionLocal()
@@ -100,7 +105,7 @@ async def predict(user_id: int,tag: int,file: UploadFile = File(...),db: Session
             with open(save_path, "wb") as buffer:
                 buffer.write(await file.read())
 
-        bird_name,score = infer('BirdClass/configs/resnet_se.yml',False,audio_path=save_path,model_path='BirdClass/models/ResNetSE_Fbank/best_model/')
+        bird_name,score = infer(audio_path=save_path)
 
     if bird_name == None:#找不到
         custom_response = schemas.CustomResponse(code=404, message="未找到鸟类", data=None)
@@ -251,13 +256,11 @@ async def search_bird(bird_info: str,db: Session = Depends(get_db)):
 #     return result
  
 
-def infer(configs: str, use_gpu: bool, audio_path: str, model_path: str):
-    # 获取识别器
-    predictor = MAClsPredictor(configs=configs,
-                            model_path=model_path,
-                            use_gpu=use_gpu)
+def infer( audio_path: str):
+    #
+    
 
     label, score = predictor.predict(audio_data=audio_path)
 
-    print(f'音频：{audio_path} 的预测结果标签为：{label}，得分：{score}')
+    # print(f'音频：{audio_path} 的预测结果标签为：{label}，得分：{score}')
     return label,score
