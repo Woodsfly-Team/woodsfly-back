@@ -20,11 +20,21 @@ from encode_and_decode import (
     decode_base64_to_audio,
 )
 
-# 预先创建数据表
+
+from datetime import datetime
+import os
+
+#预先创建数据表
+
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+
+#  获取识别器
+predictor = MAClsPredictor(configs='BirdClass/configs/resnet_se.yml',
+                        model_path='BirdClass/models/ResNetSE_Fbank/best_model/',
+                        use_gpu=False)
 
 # 数据库连接
 def get_db():
@@ -69,7 +79,7 @@ async def read_index():
 
 
 # 图片接口
-@app.post("/image/")
+@app.post("/image")
 async def get_image(file: UploadFile = File(...)):
     with open(file.filename, "wb") as buffer:
         buffer.write(await file.read())
@@ -80,6 +90,69 @@ async def get_image(file: UploadFile = File(...)):
 @app.get("/audio/")
 async def get_audio():
     return FileResponse("user_data/516341.wav", media_type="wav")
+
+
+@app.post("/predict")
+async def predict(user_id: int,tag: int,file: UploadFile = File(...),db: Session = Depends(get_db)):
+    if crud.get_user_id_exist(db,user_id) == False:#用户不存在
+        custom_response = schemas.CustomResponse(code=404, message="用户不存在", data=None)
+        return custom_response
+    if file == None or tag not in [1,2]:#参数错误
+        custom_response = schemas.CustomResponse(code=400, message="参数错误", data=None)
+        return custom_response
+    
+    content_type = file.content_type
+    if tag == 1 and content_type == 'image/png' or content_type == 'image/jpeg' or content_type == 'image/jpg':
+        current_datetime = datetime.now()
+        save_path = f'user_data/{user_id}/image/{current_datetime.year}/' \
+                       f'{current_datetime.year}_{current_datetime.month}/{current_datetime.month}_{current_datetime.day}/' \
+                       f'{current_datetime.hour}_{current_datetime.minute}_{current_datetime.second}/' \
+                       f'{user_id}_{file.filename}'
+    
+        # 确保输出目录存在
+        output_dir = '/'.join(save_path.split('/')[:-1])
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+            # 保存文件
+            with open(save_path, "wb") as buffer:
+                buffer.write(await file.read())
+    elif tag == 2 : # 音频识别
+        current_datetime = datetime.now()
+        save_path = f'user_data/{user_id}/audio/{current_datetime.year}/' \
+                       f'{current_datetime.year}_{current_datetime.month}/{current_datetime.month}_{current_datetime.day}/' \
+                       f'{current_datetime.hour}_{current_datetime.minute}_{current_datetime.second}/' \
+                       f'{user_id}_{file.filename}'
+        # 确保输出目录存在
+        output_dir = '/'.join(save_path.split('/')[:-1])
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+            # 保存文件
+            with open(save_path, "wb") as buffer:
+                buffer.write(await file.read())
+
+        bird_name,score = infer(audio_path=save_path)
+
+    if bird_name == None:#找不到
+        custom_response = schemas.CustomResponse(code=404, message="未找到鸟类", data=None)
+        return custom_response
+    orm_result = crud.search_bird(db,bird_name)
+    if orm_result == []:#找不到
+        custom_response = schemas.CustomResponse(code=404, message="未找到鸟类", data=None)
+        return custom_response
+    crud.create_browse(db,user_id,orm_result.id) # 创建浏览记录
+    pyd_result = schemas.Response_Search_Bird(
+        chinese_name=orm_result.chinese_name,
+        define=schemas.Define(bird_family=orm_result.bird_family,bird_genus=orm_result.bird_genus,bird_order=orm_result.bird_order),
+        english_name=orm_result.english_name,
+        habitat=orm_result.distrbution,
+        image=orm_result.image_link,
+        link=orm_result.baidu_link,
+        introduction=orm_result.introduction,
+        level=orm_result.protection_level,
+        incidence="{:.2f}%".format(score*100.0)
+        ) 
+    custom_response = schemas.CustomResponse(code=200, message="成功", data=pyd_result)
+    return custom_response
 
 
 # 创建用户接口
@@ -204,11 +277,9 @@ async def search_bird(bird_info: str, db: Session = Depends(get_db)):
 #     return result
 
 
-def infer(configs: str, use_gpu: bool, audio_path: str, model_path: str):
-    # 获取识别器
-    predictor = MAClsPredictor(configs=configs, model_path=model_path, use_gpu=use_gpu)
-
+def infer( audio_path: str):
+    
     label, score = predictor.predict(audio_data=audio_path)
 
-    print(f"音频：{audio_path} 的预测结果标签为：{label}，得分：{score}")
-    return label
+    # print(f'音频：{audio_path} 的预测结果标签为：{label}，得分：{score}')
+    return label,score
