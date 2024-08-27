@@ -1,8 +1,8 @@
-# woodsfly-front 
+# woodsfly-back 
 
-这是鸟林通app的前端代码仓库，基于 kotlin 开发
+这是鸟林通app的后端代码仓库，基于 Python + FastAPI 开发
 
-**感谢你为 woodsfly-front 项目做出贡献！**
+**感谢你为 woodsfly-back 项目做出贡献！**
 
 ## 项目分支
 

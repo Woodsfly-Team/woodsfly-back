@@ -1,7 +1,7 @@
 *.pt
 /user_data
 **/__pycache__/
-/BirdClass/__pycache__
+
 /BirdClass/.idea/
 /BirdClass/build/
 /BirdClass/dist/

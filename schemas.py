@@ -10,21 +10,8 @@ class CustomResponse(BaseModel): # 通用响应体
     data: Any
  
 class UserBase(BaseModel):
-    username: str
-
-class UserCreate(UserBase):
-    password: str
-
-class User(UserBase):
     user_id: int
-    avatar: Union[str, None] = None
 
-    class Config:
-        orm_mode = True
-
-# class Search_Bird(BaseModel): #搜索鸟类
-#     bird_info: str
-#     tag:int
 
 class Define(BaseModel): #生物学定义
     bird_order: Union[str, None] = None
