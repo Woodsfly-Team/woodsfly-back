@@ -51,6 +51,9 @@ def create_browse(db: Session, user_id: int, bird_id: int):
 def get_browse(db: Session, user_id: int):
     return db.query(models.Browse).filter(models.Browse.user_id == user_id).all()
 
+def get_star_status(db: Session, user_id: int, bird_id: int):
+    log = db.query(models.Star).filter(models.Star.user_id == user_id).filter(models.Star.bird_id == bird_id).first()
+    return log.id
 
 # 创建用户
 def create_user(db: Session, username: str, password: str):
