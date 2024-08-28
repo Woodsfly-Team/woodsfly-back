@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 import models, schemas
 
 
+
 # 搜素鸟类（单结果）
 def search_bird(db: Session, bird_info: str):
     attributes = ["chinese_name", "english_name"]
@@ -28,11 +29,12 @@ def search_birds(db: Session, bird_info: str):
     ]
     orm_results = []
     for attr in attributes:
-        orm_results += (
+        orm_result= (
             db.query(models.Bird)
             .filter(getattr(models.Bird, attr).like(f"%{bird_info}%"))
             .all()
         )
+        orm_results = list(set(orm_results + orm_result))
     if orm_results:
         return orm_results
     return []
@@ -73,6 +75,16 @@ def username_has_exist(db: Session, username: str):
         return True
     else:
         return False
+    
+
+# 查询用户ID是否存在
+def get_user_id_exist(db: Session, user_id: int):
+    result = db.query(models.User).filter(models.User.id == user_id).first()
+    if result:
+        return True
+    else:
+        return False
+    
 # 检查密码
 def check_password(db: Session, username: str, password: str):
     user = db.query(models.User).filter(models.User.username == username).first()

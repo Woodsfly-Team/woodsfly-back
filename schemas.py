@@ -19,6 +19,7 @@ class Define(BaseModel): #生物学定义
     bird_genus: Union[str, None] = None
 
 class Response_Search_Bird(BaseModel): #查询鸟类响应体
+    bird_id: Union[int, None] = None
     chinese_name: Union[str, None] = None
     english_name: Union[str, None] = None
     incidence: Union[str, None] = None
@@ -30,6 +31,7 @@ class Response_Search_Bird(BaseModel): #查询鸟类响应体
     link: Union[str, None] = None
 
 class Response_Matchinfo(BaseModel): #匹配信息响应体
+    bird_id: Union[int, None] = None
     chinese_name: Union[str, None] = None
     english_name: Union[str, None] = None
     define: Define
