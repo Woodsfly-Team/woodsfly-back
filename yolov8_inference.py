@@ -8,7 +8,7 @@ model = YOLO("yolov8s_0820.pt")
 def yolov8_inference(source):
     
     # Run inference on the source
-    results = model.predict(source, conf=0.4,iou=0.7,max_det=10,imgsz=640)  # list of Results objects
+    results = model.predict(source, conf=0.7,iou=0.7,max_det=1,imgsz=640)  # list of Results objects
     # Process results list
     for result in results:
         boxes = result.boxes  # Boxes object for bounding box outputs
@@ -20,7 +20,7 @@ def yolov8_inference(source):
         # result.save(filename="result.jpg")  # save to disk
     if boxes.cls.numel() == 0:
         return None
-    return result.names[boxes.cls.item()]
+    return result.names[boxes.cls.item()],boxes.conf.item()
     
     
 
