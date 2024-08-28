@@ -1,46 +1,26 @@
-from BirdClass.macls.predict import MAClsPredictor
-from BirdClass.macls.utils.utils import add_arguments, print_arguments
+# 引入音频识别模型相关库文件
+from BirdClass.infer import infer
 
-
+# 引入FastAPI相关库文件
 from fastapi import Depends, FastAPI, UploadFile, File
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
+# 引入数据库相关库文件
 import crud
-import models
 import schemas
-from database import SessionLocal, engine
+from database import get_db
 
-from yolov8_inference import yolov8_inference
+# 引入yolov8相关库文件
+from yolov8.yolov8_inference import yolov8_inference
 from datetime import datetime
 import os
 from random_image import get_random_image_from_folder
 
-# 预先创建数据表
 
-models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
-
-#  获取识别器
-predictor = MAClsPredictor(
-    configs="BirdClass/configs/resnet_se.yml",
-    model_path="BirdClass/models/ResNetSE_Fbank/best_model/",
-    use_gpu=False,
-)
-
-
-# 数据库连接
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
 # 静态资源
 app.mount("/assets", StaticFiles(directory="2125_artxibition/assets"), name="static")
 
@@ -337,8 +317,4 @@ async def get_star_status(user_id: int, bird_id: int, db: Session = Depends(get_
 #     return result
 
 
-def infer(audio_path: str):
-    label, score = predictor.predict(audio_data=audio_path)
 
-    # print(f'音频：{audio_path} 的预测结果标签为：{label}，得分：{score}')
-    return label, score
