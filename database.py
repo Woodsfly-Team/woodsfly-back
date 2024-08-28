@@ -13,3 +13,15 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
  
 #5.创建一个Base类
 Base = declarative_base()
+
+
+# 数据库连接
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# 预先创建数据表
+Base.metadata.create_all(bind=engine)
