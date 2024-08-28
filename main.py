@@ -13,16 +13,9 @@ import schemas
 from database import SessionLocal, engine
 
 from yolov8_inference import yolov8_inference
-from encode_and_decode import (
-    encode_image_to_base64,
-    decode_base64_to_image,
-    encode_audio_to_base64,
-    decode_base64_to_audio,
-)
-
-
 from datetime import datetime
 import os
+from random_image import get_random_image_from_folder
 
 # 预先创建数据表
 
@@ -77,10 +70,15 @@ async def read_index():
 
 # 图片接口
 @app.post("/image")
-async def get_image(file: UploadFile = File(...)):
-    with open(file.filename, "wb") as buffer:
-        buffer.write(await file.read())
-    return {"ok": "ok"}
+async def get_image(file_id: int, db: Session = Depends(get_db)):
+    brid_name = crud.search_bird_by_id(db,file_id).english_name
+    print(brid_name)
+    if brid_name is None:#找不到
+        return schemas.CustomResponse(code=404, message="未找到鸟类", data=None)
+    
+    folder_path = f'datasets/{brid_name}'
+    file_path = get_random_image_from_folder(folder_path)
+    return FileResponse(path=file_path)
 
 
 # 音频接口
@@ -88,22 +86,17 @@ async def get_image(file: UploadFile = File(...)):
 async def get_audio():
     return FileResponse("user_data/516341.wav", media_type="wav")
 
-
+# 预测接口
 @app.post("/predict")
-async def predict(
-    user_id: int, tag: int, file: UploadFile = File(...), db: Session = Depends(get_db)
-):
-    if crud.get_user_id_exist(db, user_id) == False:  # 用户不存在
-        custom_response = schemas.CustomResponse(
-            code=404, message="用户不存在", data=None
-        )
-        return custom_response
-    if file == None or tag not in [1, 2]:  # 参数错误
-        custom_response = schemas.CustomResponse(
-            code=400, message="参数错误", data=None
-        )
-        return custom_response
-
+async def predict(user_id: int,tag: int,file: UploadFile = File(...),db: Session = Depends(get_db)):
+    if crud.get_user_id_exist(db,user_id) is False:#用户不存在
+        data = None
+        return schemas.CustomResponse(code=404, message="用户不存在", data=data)
+    
+    if file is None or tag not in [1,2]:#参数错误
+        data = None
+        return schemas.CustomResponse(code=400, message="参数错误", data=data)
+    
     content_type = file.content_type
     if (
         tag == 1
@@ -126,7 +119,10 @@ async def predict(
             # 保存文件
             with open(save_path, "wb") as buffer:
                 buffer.write(await file.read())
-    elif tag == 2:  # 音频识别
+            
+        bird_name,score = yolov8_inference(save_path)
+
+    elif tag == 2 : # 音频识别
         current_datetime = datetime.now()
         save_path = (
             f"user_data/{user_id}/audio/{current_datetime.year}/"
@@ -144,35 +140,34 @@ async def predict(
 
         bird_name, score = infer(audio_path=save_path)
 
-    if bird_name == None:  # 找不到
-        custom_response = schemas.CustomResponse(
-            code=404, message="未找到鸟类", data=None
-        )
-        return custom_response
-    orm_result = crud.search_bird(db, bird_name)
-    if orm_result == []:  # 找不到
-        custom_response = schemas.CustomResponse(
-            code=404, message="未找到鸟类", data=None
-        )
-        return custom_response
-    crud.create_browse(db, user_id, orm_result.id)  # 创建浏览记录
+    if bird_name is None:#找不到
+        return schemas.CustomResponse(code=404, message="未找到鸟类", data=None)
+
+    orm_result = crud.search_bird(db,bird_name)
+
+    if orm_result is None:#找不到
+        return schemas.CustomResponse(code=404, message="未找到鸟类", data=None)
+
+    # crud.create_browse(db,user_id,orm_result.id) # 创建浏览记录
+
+    # 将orm转换成pydantic
     pyd_result = schemas.Response_Search_Bird(
-        chinese_name=orm_result.chinese_name,
+        bird_id = orm_result.id,
+        chinese_name = orm_result.chinese_name,
         define=schemas.Define(
-            bird_family=orm_result.bird_family,
-            bird_genus=orm_result.bird_genus,
-            bird_order=orm_result.bird_order,
-        ),
-        english_name=orm_result.english_name,
-        habitat=orm_result.distrbution,
-        image=orm_result.image_link,
-        link=orm_result.baidu_link,
-        introduction=orm_result.introduction,
-        level=orm_result.protection_level,
-        incidence="{:.2f}%".format(score * 100.0),
-    )
-    custom_response = schemas.CustomResponse(code=200, message="成功", data=pyd_result)
-    return custom_response
+            bird_family = orm_result.bird_family,
+            bird_genus = orm_result.bird_genus,
+            bird_order = orm_result.bird_order
+            ),
+        english_name = orm_result.english_name,
+        habitat = orm_result.distrbution,
+        image = orm_result.id,
+        link = orm_result.baidu_link,
+        introduction = orm_result.introduction,
+        level = orm_result.protection_level,
+        incidence = "{:.2f}%".format(score*100.0)
+        ) 
+    return schemas.CustomResponse(code=200, message="成功", data=pyd_result)
 
 
 # 创建用户接口
@@ -204,35 +199,16 @@ async def user_login(username: str, password: str, db: Session = Depends(get_db)
         return schemas.CustomResponse(code=400, message="成功登录", data=data)
 
 
-# 查询接口
+# 快速搜索接口
 @app.get("/search")
-async def search_bird(bird_name: str, db: Session = Depends(get_db)):
-    orm_result = crud.search_bird(db, bird_name)
-    if orm_result == []:  # 找不到
-        custom_response = schemas.CustomResponse(
-            code=404, message="未找到鸟类", data=None
-        )
-        return custom_response
-    custom_response = schemas.CustomResponse(code=200, message="成功", data=None)
-    return custom_response
-
-
-# 搜索匹配接口
-@app.post("/matchinfo/")
-async def search_bird(bird_info: str, db: Session = Depends(get_db)):
-    if bird_info is None:  # 参数错误
-        custom_response = schemas.CustomResponse(
-            code=400, message="参数错误", data=None
-        )
-        return custom_response
-    orm_results = crud.search_birds(db, bird_info)
-    if orm_results == []:  # 找不到
-        custom_response = schemas.CustomResponse(
-            code=404, message="未找到鸟类", data=None
-        )
-        return custom_response
+async def search_birds(bird_name: str, db: Session = Depends(get_db)):
+    orm_results = crud.search_birds(db, bird_name)
+    if orm_results is None:  # 找不到
+        return schemas.CustomResponse(code=404, message="未找到鸟类", data=None)
+    
     pyd_results = [
         schemas.Response_Matchinfo(
+            bird_id=orm_result.id,
             chinese_name=orm_result.chinese_name,
             english_name=orm_result.english_name,
             define=schemas.Define(
@@ -243,8 +219,65 @@ async def search_bird(bird_info: str, db: Session = Depends(get_db)):
         )
         for orm_result in orm_results
     ]
-    custom_response = schemas.CustomResponse(code=200, message="成功", data=pyd_results)
-    return custom_response
+    return schemas.CustomResponse(code=200, message="成功", data=pyd_results)
+
+
+
+# 搜索详情接口
+@app.post("/search")
+async def search_bird(bird_id: int, db: Session = Depends(get_db)):
+
+    orm_result = crud.search_bird_by_id(db, bird_id)
+    if orm_result is None:  # 找不到
+        return schemas.CustomResponse(code=404, message="未找到鸟类", data=None)
+    
+    # 将orm转换成pydantic
+    pyd_result = schemas.Response_Search_Bird(
+        bird_id = orm_result.id,
+        chinese_name = orm_result.chinese_name,
+        define=schemas.Define(
+            bird_family = orm_result.bird_family,
+            bird_genus = orm_result.bird_genus,
+            bird_order = orm_result.bird_order
+            ),
+        english_name = orm_result.english_name,
+        habitat = orm_result.distrbution,
+        image = orm_result.id,
+        link = orm_result.baidu_link,
+        introduction = orm_result.introduction,
+        level = orm_result.protection_level,
+        incidence = "---"
+        ) 
+    return schemas.CustomResponse(code=200, message="成功", data=pyd_result)
+
+# 搜索匹配接口
+# @app.post("/matchinfo/")
+# async def search_bird(bird_info: str, db: Session = Depends(get_db)):
+#     if bird_info is None:  # 参数错误
+#         custom_response = schemas.CustomResponse(
+#             code=400, message="参数错误", data=None
+#         )
+#         return custom_response
+#     orm_results = crud.search_birds(db, bird_info)
+#     if orm_results is None:  # 找不到
+#         custom_response = schemas.CustomResponse(
+#             code=404, message="未找到鸟类", data=None
+#         )
+#         return custom_response
+#     pyd_results = [
+#         schemas.Response_Matchinfo(
+#             chinese_name=orm_result.chinese_name,
+#             english_name=orm_result.english_name,
+#             define=schemas.Define(
+#                 bird_family=orm_result.bird_family,
+#                 bird_genus=orm_result.bird_genus,
+#                 bird_order=orm_result.bird_order,
+#             ),
+#         )
+#         for orm_result in orm_results
+#     ]
+#     custom_response = schemas.CustomResponse(code=200, message="成功", data=pyd_results)
+#     return custom_response
 
 
 @app.get("/star")
