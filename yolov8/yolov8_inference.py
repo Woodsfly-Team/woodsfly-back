@@ -1,7 +1,7 @@
 from ultralytics import YOLO
 
 # Load a pretrained YOLOv8n model
-model = YOLO("yolov8s_0820.pt")
+model = YOLO("yolov8/yolov8s_0820.pt")
 
 
 
