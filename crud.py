@@ -3,7 +3,16 @@ from sqlalchemy.orm import Session
 import models, schemas
 
 
-
+# ID搜索鸟类
+def search_bird_by_id(db: Session, bird_id: int):
+    orm_result = (
+        db.query(models.Bird)
+        .filter(models.Bird.id == bird_id)
+        .first()
+    )
+    if orm_result:
+        return orm_result
+    return None
 # 搜素鸟类（单结果）
 def search_bird(db: Session, bird_info: str):
     attributes = ["chinese_name", "english_name"]
@@ -15,7 +24,7 @@ def search_bird(db: Session, bird_info: str):
         )
         if orm_result:
             return orm_result
-    return []
+    return None
 
 
 # 搜索鸟类（多结果）
@@ -37,7 +46,7 @@ def search_birds(db: Session, bird_info: str):
         orm_results = list(set(orm_results + orm_result))
     if orm_results:
         return orm_results
-    return []
+    return None
 
 
 # 新增浏览记录

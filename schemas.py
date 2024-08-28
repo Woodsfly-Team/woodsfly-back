@@ -23,7 +23,7 @@ class Response_Search_Bird(BaseModel): #查询鸟类响应体
     chinese_name: Union[str, None] = None
     english_name: Union[str, None] = None
     incidence: Union[str, None] = None
-    image: Union[str, None] = None
+    image: Union[int, None] = None
     define: Define
     habitat: Union[str, None] = None
     introduction: Union[str, None] = None
