@@ -1,4 +1,4 @@
-name: FastAPI Deploy
+name: Deploy main
 
 on:
   pull_request:
@@ -13,7 +13,7 @@ jobs :
     - name: server_git_pull
       uses: garygrossgarten/github-action-ssh@release
       with:
-        command: ./cd_pull.sh
+        command: ./cd_pull_main.sh
         host: ${{ secrets.HOST_NAME }}
         username: root
         port: 22
