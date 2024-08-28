@@ -49,7 +49,21 @@ class Response_Matchinfo(BaseModel): #匹配信息响应体
     english_name: Union[str, None] = None
     define: Define
 
+class Response_Star_List(BaseModel):
+    star_id: Union[int, None] = None
+    star_time: Union[str, None] = None
+    bird_id: Union[int, None] = None
+    chinese_name: Union[str, None] = None
+    english_name: Union[str, None] = None
+    define: Define
 
+class Response_Browse_List(BaseModel):
+    browse_id: Union[int, None] = None
+    browse_time: Union[str, None] = None
+    bird_id: Union[int, None] = None
+    chinese_name: Union[str, None] = None
+    english_name: Union[str, None] = None
+    define: Define
 
 # #1.创建一个 ItemBase 和 UserBase 的 Pydantic模型（或者我们说“schema”）
 # class ItemBase(BaseModel):

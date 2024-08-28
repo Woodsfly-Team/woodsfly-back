@@ -205,6 +205,7 @@ async def search_bird(bird_id: int, db: Session = Depends(get_db)):
         ) 
     return schemas.CustomResponse(code=200, message="成功", data=pyd_result)
 
+
 # 搜索匹配接口
 # @app.post("/matchinfo/")
 # async def search_bird(bird_info: str, db: Session = Depends(get_db)):
@@ -243,6 +244,114 @@ async def get_star_status(user_id: int, bird_id: int, db: Session = Depends(get_
     except Exception as e:
         data = schemas.StarBase(star_id=0)
         return schemas.CustomResponse(code=404, message=str(e), data=data)
+
+
+# 查询收藏列表接口
+@app.post("/star")
+async def get_star_list(user_id: int, db: Session = Depends(get_db)):
+    star_list = crud.get_star_list(db, user_id)
+    if star_list is None:  # 找不到
+        return schemas.CustomResponse(code=200, message="未创建收藏", data=None)
+    
+    # 根据 browse_time 排序，降序
+    star_list_sorted = sorted(star_list, key=lambda x: x.time, reverse=True)
+    
+    pyd_results = []
+    for star in star_list_sorted:
+        orm_result = crud.search_bird_by_id(db, star.bird_id)
+        pyd_results.append(
+            schemas.Response_Star_List(
+                star_id = star.id,
+                star_time = str(star.time).split('.')[0],
+                bird_id = star.bird_id,
+                chinese_name = orm_result.chinese_name,
+                english_name = orm_result.english_name,
+                define=schemas.Define(
+                    bird_family = orm_result.bird_family,
+                    bird_genus = orm_result.bird_genus,
+                    bird_order = orm_result.bird_order,
+                )
+            )
+        )  
+        
+    return schemas.CustomResponse(code=200, message="成功", data=pyd_results)
+
+# 收藏接口
+@app.put("/star")
+async def create_star(user_id: int, bird_id: int, db: Session = Depends(get_db)):
+    try:
+        data = schemas.StarBase(star_id = crud.create_star(db, user_id, bird_id))
+        return schemas.CustomResponse(code=200, message="收藏成功", data=data)
+    except Exception as e:
+        data = schemas.StarBase(star_id=0)
+        return schemas.CustomResponse(code=404, message=str(e), data=data)
+    
+# 取消收藏接口
+@app.delete("/star")
+async def delete_star(star_id: int, db: Session = Depends(get_db)):
+    try:
+        crud.delete_star(db, star_id)
+        return schemas.CustomResponse(code=200, message="取消收藏成功", data=None)
+    except Exception as e:
+        return schemas.CustomResponse(code=404, message=str(e), data=None)
+    
+# 查询浏览记录列表接口
+@app.post("/browse")
+async def get_browse_list(user_id: int, db: Session = Depends(get_db)):
+    browse_list = crud.get_browse_list(db, user_id)
+    if browse_list is None:  # 找不到
+        return schemas.CustomResponse(code=200, message="未创建收藏", data=None)
+    
+    # 根据 browse_time 排序，降序
+    browse_list_sorted = sorted(browse_list, key=lambda x: x.time, reverse=True)
+    
+    pyd_results = []
+    for browse in browse_list_sorted:
+        orm_result = crud.search_bird_by_id(db, browse.bird_id)
+        pyd_results.append(
+            schemas.Response_Browse_List(
+                browse_id = browse.id,
+                browse_time = str(browse.time).split('.')[0],
+                bird_id = browse.bird_id,
+                chinese_name = orm_result.chinese_name,
+                english_name = orm_result.english_name,
+                define=schemas.Define(
+                    bird_family = orm_result.bird_family,
+                    bird_genus = orm_result.bird_genus,
+                    bird_order = orm_result.bird_order,
+                )
+            )
+        )  
+        
+    return schemas.CustomResponse(code=200, message="成功", data=pyd_results)
+
+# 创建浏览记录接口
+@app.put("/browse")
+async def create_browse(user_id: int, bird_id: int, db: Session = Depends(get_db)):
+    try:
+        browse_id_exist = crud.get_browse_status(db, user_id, bird_id)
+        if browse_id_exist > 0:
+            crud.update_browse_time(db, browse_id_exist)
+            data = schemas.BrowseBase(browse_id=browse_id_exist)
+            return schemas.CustomResponse(code=200, message="浏览记录更新成功", data=data)
+    except Exception as e:
+        
+        try:
+            data = schemas.BrowseBase(browse_id = crud.create_browse(db, user_id, bird_id))
+            return schemas.CustomResponse(code=200, message="浏览记录创建成功", data=data)
+        except Exception as e:
+            data = schemas.BrowseBase(browse_id=0)
+            return schemas.CustomResponse(code=404, message=str(e), data=data)
+    
+
+# 删除浏览记录接口
+@app.delete("/browse")
+async def delete_browse(browse_id: int, db: Session = Depends(get_db)):
+    try:
+        crud.delete_browse(db, browse_id)
+        return schemas.CustomResponse(code=200, message="浏览记录删除成功", data=None)
+    except Exception as e:
+        return schemas.CustomResponse(code=404, message=str(e), data=None)
 
 
 # @app.post("/users/", response_model=schemas.User)
