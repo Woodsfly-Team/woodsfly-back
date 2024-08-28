@@ -1,5 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, TIMESTAMP,VARCHAR,Text
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, TIMESTAMP,Text
 from sqlalchemy.sql import func
 #1.用Base类来创建 SQLAlchemy 模型
 from database import Base

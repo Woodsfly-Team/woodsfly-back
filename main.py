@@ -1,27 +1,22 @@
+# 引入音频识别模型相关库文件
 from BirdClass.macls.predict import MAClsPredictor
-from BirdClass.macls.utils.utils import add_arguments, print_arguments
 
-
+# 引入FastAPI相关库文件
 from fastapi import Depends, FastAPI, UploadFile, File
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
+# 引入数据库相关库文件
 import crud
-import models
 import schemas
-from database import SessionLocal, engine
+from database import get_db
 
-from yolov8_inference import yolov8_inference
+# 引入yolov8相关库文件
+from yolov8.yolov8_inference import yolov8_inference
 from datetime import datetime
 import os
 from random_image import get_random_image_from_folder
-
-# 预先创建数据表
-
-models.Base.metadata.create_all(bind=engine)
-
-app = FastAPI()
 
 
 #  获取识别器
@@ -32,15 +27,7 @@ predictor = MAClsPredictor(
 )
 
 
-# 数据库连接
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
+app = FastAPI()
 # 静态资源
 app.mount("/assets", StaticFiles(directory="2125_artxibition/assets"), name="static")
 
