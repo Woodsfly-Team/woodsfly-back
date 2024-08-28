@@ -12,6 +12,19 @@ class CustomResponse(BaseModel): # 通用响应体
 class UserBase(BaseModel):
     user_id: int
 
+class StarBase(BaseModel): #收藏
+    star_id: int
+
+class BrowseBase(BaseModel):
+    browse_id: int
+
+
+
+
+
+
+
+
 
 class Define(BaseModel): #生物学定义
     bird_order: Union[str, None] = None
