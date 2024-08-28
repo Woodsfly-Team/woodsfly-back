@@ -79,7 +79,7 @@ async def get_image(file_id: int, db: Session = Depends(get_db)):
     if brid_name is None:#找不到
         return schemas.CustomResponse(code=404, message="未找到鸟类", data=None)
     
-    folder_path = f'D:/HuaweiMoveData/Users/chen/Desktop/brid_dataset/datasets/{brid_name}'
+    folder_path = f'datasets/{brid_name}'
     file_path = get_random_image_from_folder(folder_path)
     return FileResponse(path=file_path)
 
