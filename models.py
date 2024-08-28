@@ -52,9 +52,9 @@ class Browse(Base):# 浏览记录表
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer)
     bird_id = Column(Integer)
-    browse_time = Column(TIMESTAMP(6),server_default=func.current_timestamp(6))
+    time = Column(TIMESTAMP(6),server_default=func.current_timestamp(6))
 
-class Collect(Base):# 收藏表
+class Star(Base):# 收藏表
     __tablename__ = "star"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer)

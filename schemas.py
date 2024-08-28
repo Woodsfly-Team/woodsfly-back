@@ -12,6 +12,19 @@ class CustomResponse(BaseModel): # 通用响应体
 class UserBase(BaseModel):
     user_id: int
 
+class StarBase(BaseModel): #收藏
+    star_id: int
+
+class BrowseBase(BaseModel):
+    browse_id: int
+
+
+
+
+
+
+
+
 
 class Define(BaseModel): #生物学定义
     bird_order: Union[str, None] = None
@@ -23,7 +36,7 @@ class Response_Search_Bird(BaseModel): #查询鸟类响应体
     chinese_name: Union[str, None] = None
     english_name: Union[str, None] = None
     incidence: Union[str, None] = None
-    image: Union[str, None] = None
+    image: Union[int, None] = None
     define: Define
     habitat: Union[str, None] = None
     introduction: Union[str, None] = None

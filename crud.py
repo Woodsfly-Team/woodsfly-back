@@ -3,7 +3,16 @@ from sqlalchemy.orm import Session
 import models, schemas
 
 
-
+# ID搜索鸟类
+def search_bird_by_id(db: Session, bird_id: int):
+    orm_result = (
+        db.query(models.Bird)
+        .filter(models.Bird.id == bird_id)
+        .first()
+    )
+    if orm_result:
+        return orm_result
+    return None
 # 搜素鸟类（单结果）
 def search_bird(db: Session, bird_info: str):
     attributes = ["chinese_name", "english_name"]
@@ -15,7 +24,7 @@ def search_bird(db: Session, bird_info: str):
         )
         if orm_result:
             return orm_result
-    return []
+    return None
 
 
 # 搜索鸟类（多结果）
@@ -37,7 +46,7 @@ def search_birds(db: Session, bird_info: str):
         orm_results = list(set(orm_results + orm_result))
     if orm_results:
         return orm_results
-    return []
+    return None
 
 
 # 新增浏览记录
@@ -53,6 +62,9 @@ def create_browse(db: Session, user_id: int, bird_id: int):
 def get_browse(db: Session, user_id: int):
     return db.query(models.Browse).filter(models.Browse.user_id == user_id).all()
 
+def get_star_status(db: Session, user_id: int, bird_id: int):
+    log = db.query(models.Star).filter(models.Star.user_id == user_id).filter(models.Star.bird_id == bird_id).first()
+    return log.id
 
 # 创建用户
 def create_user(db: Session, username: str, password: str):
