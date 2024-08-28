@@ -6,8 +6,8 @@ website_router = APIRouter()
 # 首页接口
 @website_router.get("/")
 async def read_index():
-    return FileResponse("2125_artxibition/index.html")
+    return FileResponse("website/index.html")
 
 @website_router.get("/page/{file_name}")
 async def read_file(file_name: str):
-    return FileResponse(f"2125_artxibition/{file_name}")
+    return FileResponse(f"website/{file_name}")
