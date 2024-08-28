@@ -19,16 +19,16 @@ import os
 from random_image import get_random_image_from_folder
 
 # 引入接口
-import user_router
-import website_router
+import user_routers
+import website_routers
 
 # 配置FastAPI实例
 app = FastAPI()
 app.mount("/assets", StaticFiles(directory="2125_artxibition/assets"), name="static")
 
 # 引入接口
-app.include_router(user_router.user_router)
-app.include_router(website_router.web_router)
+app.include_router(user_routers.user_router)
+app.include_router(website_routers.website_router)
 
 
 # 测试启动接口

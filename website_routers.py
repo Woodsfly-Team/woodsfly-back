@@ -8,13 +8,13 @@ import crud
 from database import get_db
 
 
-web_router = APIRouter()
+website_router = APIRouter()
 
 # 首页接口
-@web_router.get("/")
+@website_router.get("/")
 async def read_index():
     return FileResponse("2125_artxibition/index.html")
 
-@web_router.get("/{file_name}") 
+@website_router.get("/{file_name}")
 async def read_file(file_name: str):
     return FileResponse(f"2125_artxibition/{file_name}")
