@@ -1,12 +1,5 @@
-from fastapi import APIRouter, Depends, FastAPI, UploadFile, File
-
+from fastapi import APIRouter
 from fastapi.responses import FileResponse
-
-from sqlalchemy.orm import Session
-import schemas
-import crud
-from database import get_db
-
 
 website_router = APIRouter()
 
@@ -15,6 +8,6 @@ website_router = APIRouter()
 async def read_index():
     return FileResponse("2125_artxibition/index.html")
 
-@website_router.get("/{file_name}")
+@website_router.get("/page/{file_name}")
 async def read_file(file_name: str):
     return FileResponse(f"2125_artxibition/{file_name}")
