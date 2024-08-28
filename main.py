@@ -18,11 +18,17 @@ from datetime import datetime
 import os
 from random_image import get_random_image_from_folder
 
+# 引入接口
+import user_routers
+import website_routers
 
-
+# 配置FastAPI实例
 app = FastAPI()
-# 静态资源
 app.mount("/assets", StaticFiles(directory="2125_artxibition/assets"), name="static")
+
+# 引入接口
+app.include_router(user_routers.user_router)
+app.include_router(website_routers.website_router)
 
 
 # 测试启动接口
@@ -42,10 +48,7 @@ async def get_star_status(user_id=1, bird_id=1, db: Session = Depends(get_db)):
         return schemas.CustomResponse(code=404, message=e, data=data)
 
 
-# 首页接口
-@app.get("/")
-async def read_index():
-    return FileResponse("2125_artxibition/index.html")
+
 
 
 # 图片接口
@@ -149,34 +152,6 @@ async def predict(user_id: int,tag: int,file: UploadFile = File(...),db: Session
         ) 
     return schemas.CustomResponse(code=200, message="成功", data=pyd_result)
 
-
-# 创建用户接口
-@app.put("/user")
-async def user_create(username: str, password: str, db: Session = Depends(get_db)):
-    if crud.username_has_exist(db, username):  # 用户名已存在
-        data = None
-        return schemas.CustomResponse(code=400, message="用户名已存在", data=data)
-
-    else:  # 用户名不存在
-        user_id = crud.create_user(db=db, username=username, password=password)
-        data = schemas.UserBase(user_id=user_id)
-        return schemas.CustomResponse(code=200, message="成功创建用户", data=data)
-
-
-# 登录接口
-@app.post("/user")
-async def user_login(username: str, password: str, db: Session = Depends(get_db)):
-    if not crud.username_has_exist(db, username):  # 用户名不存在
-        data = None
-        return schemas.CustomResponse(code=400, message="用户名不存在", data=data)
-
-    elif crud.check_password(db, username, password):  # 密码正确
-        user_id = crud.get_user_id(db, username)
-        data = schemas.UserBase(user_id=user_id)
-        return schemas.CustomResponse(code=400, message="成功登录", data=data)
-
-    else:  # 密码错误
-        return schemas.CustomResponse(code=400, message="成功登录", data=data)
 
 
 # 快速搜索接口
