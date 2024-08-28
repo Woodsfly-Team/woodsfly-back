@@ -1,11 +1,10 @@
 *.pt
+**/__pycache__
 /user_data
-**/__pycache__/
 
 /BirdClass/.idea/
 /BirdClass/build/
 /BirdClass/dist/
-
 /BirdClass/log/
 /BirdClass/output/
 /BirdClass/models/
