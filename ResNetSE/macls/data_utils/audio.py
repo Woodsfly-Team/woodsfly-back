@@ -7,7 +7,7 @@ import numpy as np
 import resampy
 import soundfile
 
-from BirdClass.macls.data_utils.utils import buf_to_float, vad, decode_audio
+from ResNetSE.macls.data_utils.utils import buf_to_float, vad, decode_audio
 
 
 class AudioSegment(object):
