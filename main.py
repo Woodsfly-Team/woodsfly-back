@@ -24,11 +24,26 @@ import website_routers
 
 # 配置FastAPI实例
 app = FastAPI()
-app.mount("/assets", StaticFiles(directory="2125_artxibition/assets"), name="static")
 
 # 引入接口
 app.include_router(user_routers.user_router)
 app.include_router(website_routers.website_router)
+
+print(
+    (
+        """\033[94m                                                                                   
+        ██╗    ██╗ ██████╗  ██████╗ ██████╗ ███████╗███████╗██╗     ██╗   ██╗
+        ██║    ██║██╔═══██╗██╔═══██╗██╔══██╗██╔════╝██╔════╝██║     ╚██╗ ██╔╝
+        ██║ █╗ ██║██║   ██║██║   ██║██║  ██║███████╗█████╗  ██║      ╚████╔╝ 
+        ██║███╗██║██║   ██║██║   ██║██║  ██║╚════██║██╔══╝  ██║       ╚██╔╝  
+        ╚███╔███╔╝╚██████╔╝╚██████╔╝██████╔╝███████║██║     ███████╗   ██║   
+         ╚══╝╚══╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚══════╝╚═╝     ╚══════╝   ╚═╝   
+                                                                    
+    \033[0m"""
+    )
+)
+
+
 
 
 # 测试启动接口
@@ -39,7 +54,7 @@ async def is_running():
 
 # 测试接口
 @app.get("/test")
-async def get_star_status(user_id=1, bird_id=1, db: Session = Depends(get_db)):
+async def test(user_id=1, bird_id=1, db: Session = Depends(get_db)):
     try:
         data = crud.get_star_status(db=db, user_id=user_id, bird_id=bird_id)
         return schemas.CustomResponse(code=200, message="存在记录", data=data)
@@ -206,36 +221,6 @@ async def search_bird(bird_id: int, db: Session = Depends(get_db)):
     return schemas.CustomResponse(code=200, message="成功", data=pyd_result)
 
 
-# 搜索匹配接口
-# @app.post("/matchinfo/")
-# async def search_bird(bird_info: str, db: Session = Depends(get_db)):
-#     if bird_info is None:  # 参数错误
-#         custom_response = schemas.CustomResponse(
-#             code=400, message="参数错误", data=None
-#         )
-#         return custom_response
-#     orm_results = crud.search_birds(db, bird_info)
-#     if orm_results is None:  # 找不到
-#         custom_response = schemas.CustomResponse(
-#             code=404, message="未找到鸟类", data=None
-#         )
-#         return custom_response
-#     pyd_results = [
-#         schemas.Response_Matchinfo(
-#             chinese_name=orm_result.chinese_name,
-#             english_name=orm_result.english_name,
-#             define=schemas.Define(
-#                 bird_family=orm_result.bird_family,
-#                 bird_genus=orm_result.bird_genus,
-#                 bird_order=orm_result.bird_order,
-#             ),
-#         )
-#         for orm_result in orm_results
-#     ]
-#     custom_response = schemas.CustomResponse(code=200, message="成功", data=pyd_results)
-#     return custom_response
-
-
 @app.get("/star")
 async def get_star_status(user_id: int, bird_id: int, db: Session = Depends(get_db)):
     try:
@@ -334,7 +319,7 @@ async def create_browse(user_id: int, bird_id: int, db: Session = Depends(get_db
             crud.update_browse_time(db, browse_id_exist)
             data = schemas.BrowseBase(browse_id=browse_id_exist)
             return schemas.CustomResponse(code=200, message="浏览记录更新成功", data=data)
-    except Exception as e:
+    except Exception:
         
         try:
             data = schemas.BrowseBase(browse_id = crud.create_browse(db, user_id, bird_id))
@@ -352,53 +337,5 @@ async def delete_browse(browse_id: int, db: Session = Depends(get_db)):
         return schemas.CustomResponse(code=200, message="浏览记录删除成功", data=None)
     except Exception as e:
         return schemas.CustomResponse(code=404, message=str(e), data=None)
-
-
-# @app.post("/users/", response_model=schemas.User)
-# def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-#     db_user = crud.get_user_by_email(db, phone=user.phone)
-#     if db_user:
-#         raise HTTPException(status_code=400, detail="Email already registered")
-#     return crud.create_user(db=db, user=user)
-
-
-# @app.get("/users/", response_model=List[schemas.User])
-# def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-#     users = crud.get_users(db, skip=skip, limit=limit)
-#     return users
-
-
-# @app.get("/users/{user_id}", response_model=schemas.User)
-# def read_user(user_id: int, db: Session = Depends(get_db)):
-#     db_user = crud.get_user_by_id(db, user_id=user_id)
-#     if db_user is None:
-#         raise HTTPException(status_code=404, detail="User not found")
-#     return db_user
-
-
-# @app.post("/users/{user_id}/items/", response_model=schemas.Item)
-# def create_item_for_user(
-#     user_id: int, item: schemas.ItemCreate, db: Session = Depends(get_db)
-# ):
-#     return crud.create_user_item(db=db, item=item, user_id=user_id)
-
-
-# @app.get("/", response_model=List[schemas.Item])
-# def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-#     items = crud.get_items(db, skip=skip, limit=limit)
-#     return items
-
-
-# @app.put("/update_item/{item_id}/")
-# def update_item(item_id: int,desc: str, db: Session = Depends(get_db)):
-#     db_item = crud.update_item_desc_by_id(db, id=item_id, desc=desc)
-#     return db_item
-
-
-# @app.delete("/delete_item/{owner_id}/")
-# def delete_item(owner_id: int, db: Session = Depends(get_db)):
-#     result = crud.delete_item_by_ownerId2(db, owner_id=owner_id)
-#     return result
-
 
 
