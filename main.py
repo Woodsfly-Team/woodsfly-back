@@ -24,24 +24,25 @@ import website_routers
 
 # 配置FastAPI实例
 app = FastAPI()
-
-# 引入接口
-app.include_router(user_routers.user_router)
-app.include_router(website_routers.website_router)
-
-print(
-    (
-        """\033[94m                                                                                   
+print(        
+    """
+    
+    \033[94m                                                                                   
         ██╗    ██╗ ██████╗  ██████╗ ██████╗ ███████╗███████╗██╗     ██╗   ██╗
         ██║    ██║██╔═══██╗██╔═══██╗██╔══██╗██╔════╝██╔════╝██║     ╚██╗ ██╔╝
         ██║ █╗ ██║██║   ██║██║   ██║██║  ██║███████╗█████╗  ██║      ╚████╔╝ 
         ██║███╗██║██║   ██║██║   ██║██║  ██║╚════██║██╔══╝  ██║       ╚██╔╝  
         ╚███╔███╔╝╚██████╔╝╚██████╔╝██████╔╝███████║██║     ███████╗   ██║   
-         ╚══╝╚══╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚══════╝╚═╝     ╚══════╝   ╚═╝   
-                                                                    
+            ╚══╝╚══╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚══════╝╚═╝     ╚══════╝   ╚═╝                                              
     \033[0m"""
-    )
 )
+
+
+# 引入接口
+app.include_router(user_routers.user_router)
+app.include_router(website_routers.website_router)
+
+app.mount("/website", StaticFiles(directory="website"), name="static")
 
 
 
