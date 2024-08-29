@@ -29,6 +29,22 @@ app = FastAPI()
 app.include_router(user_routers.user_router)
 app.include_router(website_routers.website_router)
 
+print(
+    (
+        """\033[94m                                                                                   
+        ██╗    ██╗ ██████╗  ██████╗ ██████╗ ███████╗███████╗██╗     ██╗   ██╗
+        ██║    ██║██╔═══██╗██╔═══██╗██╔══██╗██╔════╝██╔════╝██║     ╚██╗ ██╔╝
+        ██║ █╗ ██║██║   ██║██║   ██║██║  ██║███████╗█████╗  ██║      ╚████╔╝ 
+        ██║███╗██║██║   ██║██║   ██║██║  ██║╚════██║██╔══╝  ██║       ╚██╔╝  
+        ╚███╔███╔╝╚██████╔╝╚██████╔╝██████╔╝███████║██║     ███████╗   ██║   
+         ╚══╝╚══╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚══════╝╚═╝     ╚══════╝   ╚═╝   
+                                                                    
+    \033[0m"""
+    )
+)
+
+
+
 
 # 测试启动接口
 @app.get("/is-running")
@@ -38,7 +54,7 @@ async def is_running():
 
 # 测试接口
 @app.get("/test")
-async def get_star_status(user_id=1, bird_id=1, db: Session = Depends(get_db)):
+async def test(user_id=1, bird_id=1, db: Session = Depends(get_db)):
     try:
         data = crud.get_star_status(db=db, user_id=user_id, bird_id=bird_id)
         return schemas.CustomResponse(code=200, message="存在记录", data=data)
@@ -303,7 +319,7 @@ async def create_browse(user_id: int, bird_id: int, db: Session = Depends(get_db
             crud.update_browse_time(db, browse_id_exist)
             data = schemas.BrowseBase(browse_id=browse_id_exist)
             return schemas.CustomResponse(code=200, message="浏览记录更新成功", data=data)
-    except Exception as e:
+    except Exception:
         
         try:
             data = schemas.BrowseBase(browse_id = crud.create_browse(db, user_id, bird_id))
