@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import func
 
 import models, schemas
 
@@ -49,22 +50,22 @@ def search_birds(db: Session, bird_info: str):
     return None
 
 
-# 新增浏览记录
-def create_browse(db: Session, user_id: int, bird_id: int):
-    db_browse = models.Browse(user_id=user_id, bird_id=bird_id)
-    db.add(db_browse)
-    db.commit()
-    db.refresh(db_browse)
-    return db_browse
+# # 新增浏览记录
+# def create_browse(db: Session, user_id: int, bird_id: int):
+#     db_browse = models.Browse(user_id=user_id, bird_id=bird_id)
+#     db.add(db_browse)
+#     db.commit()
+#     db.refresh(db_browse)
+#     return db_browse
 
 
-# 查询浏览记录
-def get_browse(db: Session, user_id: int):
-    return db.query(models.Browse).filter(models.Browse.user_id == user_id).all()
+# # 查询浏览记录
+# def get_browse(db: Session, user_id: int):
+#     return db.query(models.Browse).filter(models.Browse.user_id == user_id).all()
 
-def get_star_status(db: Session, user_id: int, bird_id: int):
-    log = db.query(models.Star).filter(models.Star.user_id == user_id).filter(models.Star.bird_id == bird_id).first()
-    return log.id
+# def get_star_status(db: Session, user_id: int, bird_id: int):
+#     log = db.query(models.Star).filter(models.Star.user_id == user_id).filter(models.Star.bird_id == bird_id).first()
+#     return log.id
 
 # 创建用户
 def create_user(db: Session, username: str, password: str):
@@ -97,6 +98,7 @@ def get_user_id_exist(db: Session, user_id: int):
     else:
         return False
     
+    
 # 检查密码
 def check_password(db: Session, username: str, password: str):
     user = db.query(models.User).filter(models.User.username == username).first()
@@ -105,10 +107,116 @@ def check_password(db: Session, username: str, password: str):
     else:
         return False
 
+
 # 通过用户名查询用户id
 def get_user_id(db: Session, username: str):
     return db.query(models.User).filter(models.User.username == username).first().id
 
+
+# 查询收藏状态
+def get_star_status(db: Session, user_id: int, bird_id: int):
+    log = (
+        db.query(models.Star)
+        .filter(models.Star.user_id == user_id)
+        .filter(models.Star.bird_id == bird_id).first()
+    )
+    return log.id
+
+
+# 用户ID查询收藏列表
+def get_star_list(db: Session, user_id: int):
+    star_list = (
+        db.query(models.Star)
+        .filter(models.Star.user_id == user_id)
+        .all()
+    )
+    if star_list:
+        return star_list
+    else:
+        return None
+
+
+# 创建收藏
+def create_star(db: Session, user_id: int, bird_id: int):
+    db_star = models.Star(user_id=user_id, bird_id=bird_id)
+    db.add(db_star)
+    db.commit()
+    add_star = (
+        db.query(models.Star)
+        .filter(models.Star.user_id == user_id)
+        .filter(models.Star.bird_id == bird_id)
+        .first()
+    )
+    return add_star.id
+
+
+# 删除收藏
+def delete_star(db: Session, star_id: int):
+    (
+    db.query(models.Star)
+    .filter(models.Star.id == star_id)
+    .delete()
+    )
+    db.commit()
+    return True
+
+
+# 查询浏览记录状态
+def get_browse_status(db: Session, user_id: int, bird_id: int):
+    log = (
+        db.query(models.Browse)
+        .filter(models.Browse.user_id == user_id)
+        .filter(models.Browse.bird_id == bird_id).first()
+    )
+    return log.id
+
+
+# 更新浏览记录时间
+def update_browse_time(db: Session, browse_id):
+    (
+        db.query(models.Browse)
+        .filter(models.Browse.id == browse_id)
+        .update({"time": func.current_timestamp(6)})
+    )
+    db.commit()
+    return True
+
+# 用户ID查询浏览记录列表
+def get_browse_list(db: Session, user_id: int):
+    browse_list = (
+        db.query(models.Browse)
+        .filter(models.Browse.user_id == user_id)
+        .all()
+    )
+    if browse_list:
+        return browse_list
+    else:
+        return None
+
+
+# 创建浏览记录
+def create_browse(db: Session, user_id: int, bird_id: int):
+    db_browse = models.Browse(user_id=user_id, bird_id=bird_id)
+    db.add(db_browse)
+    db.commit()
+    add_Browse = (
+        db.query(models.Browse)
+        .filter(models.Browse.user_id == user_id)
+        .filter(models.Browse.bird_id == bird_id)
+        .first()
+    )
+    return add_Browse.id
+
+
+# 删除浏览记录
+def delete_browse(db: Session, browse_id: int):
+    (
+    db.query(models.Browse)
+    .filter(models.Browse.id == browse_id)
+    .delete()
+    )
+    db.commit()
+    return True
 
 # #通过 ID 查询单个用户。
 # def get_user(db: Session, user_id: int):
