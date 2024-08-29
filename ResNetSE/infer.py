@@ -1,9 +1,9 @@
-from BirdClass.macls.predict import MAClsPredictor
+from ResNetSE.macls.predict import MAClsPredictor
 
 #  获取识别器
 predictor = MAClsPredictor(
-    configs="BirdClass/configs/resnet_se.yml",
-    model_path="BirdClass/models/ResNetSE_Fbank/best_model/",
+    configs="ResNetSE/configs/resnet_se.yml",
+    model_path="ResNetSE/models/ResNetSE_Fbank/best_model/",
     use_gpu=False,
 )
 

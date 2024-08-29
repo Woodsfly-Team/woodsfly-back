@@ -1,7 +1,7 @@
 import torch.nn as nn
 
-from BirdClass.macls.models.pooling import AttentiveStatsPool, TemporalAveragePooling
-from BirdClass.macls.models.pooling import SelfAttentivePooling, TemporalStatisticsPooling
+from ResNetSE.macls.models.pooling import AttentiveStatsPool, TemporalAveragePooling
+from ResNetSE.macls.models.pooling import SelfAttentivePooling, TemporalStatisticsPooling
 
 
 class SEBottleneck(nn.Module):

@@ -1,5 +1,5 @@
 # 引入音频识别模型相关库文件
-from BirdClass.infer import infer
+from ResNetSE.infer import infer
 
 # 引入FastAPI相关库文件
 from fastapi import Depends, FastAPI, UploadFile, File
