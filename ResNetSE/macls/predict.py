@@ -6,12 +6,12 @@ import numpy as np
 import torch
 import yaml
 
-from BirdClass.macls import SUPPORT_MODEL
-from BirdClass.macls.data_utils.audio import AudioSegment
-from BirdClass.macls.data_utils.featurizer import AudioFeaturizer
-from BirdClass.macls.models.resnet_se import ResNetSE
-from BirdClass.macls.utils.logger import setup_logger
-from BirdClass.macls.utils.utils import dict_to_object, print_arguments
+from ResNetSE.macls import SUPPORT_MODEL
+from ResNetSE.macls.data_utils.audio import AudioSegment
+from ResNetSE.macls.data_utils.featurizer import AudioFeaturizer
+from ResNetSE.macls.models.resnet_se import ResNetSE
+from ResNetSE.macls.utils.logger import setup_logger
+from ResNetSE.macls.utils.utils import dict_to_object, print_arguments
 
 logger = setup_logger(__name__)
 
