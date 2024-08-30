@@ -4,6 +4,34 @@
 
 **感谢你为 woodsfly-back 项目做出贡献！**
 
+## 项目运行要求
+- Python 3.11+
+- pip
+
+## 启动指南
+1. 安装依赖
+
+   我们的依赖已经记录在 `requirements.txt` 文件中，由于在不同平台上所需要的依赖也有所不同，请使用我们提供的如下脚本来安装依赖。
+
+   ```bash
+   # 安装依赖
+
+   # 方法一
+   python -m ppm.pip -i
+   # 方法二
+   python -m ppm.pip --install
+   ```
+2. 启动项目
+   ```bash
+   uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+   ```
+
+
+## 推荐开发工具
+
+- [VsCode](https://code.visualstudio.com/)
+- [Ruff 插件](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff)
+
 ## 项目分支
 
 - `main` 主分支（生产环境）
@@ -60,7 +88,3 @@
 
    **请注意：严格禁止直接 push 到 `main` 分支**
 
-5.启动项目
-   ```bash
-   uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-   ```
