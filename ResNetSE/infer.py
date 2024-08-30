@@ -7,7 +7,7 @@ predictor = MAClsPredictor(
     use_gpu=False,
 )
 
-
+# 封装识别函数
 def infer(audio_path: str):
     label, score = predictor.predict(audio_data=audio_path)
 
