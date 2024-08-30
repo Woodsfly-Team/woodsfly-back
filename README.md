@@ -94,29 +94,53 @@
 
 ### 为了确保代码的一致性和可读性，特制定以下代码规范
 
-1. 文件头部注释
-
-   版权信息：所有源代码文件应包含版权信息。
-   
-   功能描述：简短描述文件的主要功能。
-
-2. 注释
+1. 注释
 
    功能注释：每个函数或方法前应有注释，描述其功能和输入输出。
+   - 示例：
+   ```Python
+   def authenticate_user(username: str, password: str) -> bool:
+    """
+    验证用户的用户名和密码是否正确。
+
+    :param username: 用户名
+    :param password: 密码
+    :return: 如果验证成功返回True，否则返回False
+    """
+    # 实现逻辑
+    pass
+   ```
    
    代码注释：复杂逻辑需添加必要的代码行注释，确保他人容易理解。
-   
-   TODO/NOTE/HACK：使用这些标记来提醒注意或后续需要改进的地方。
+   - 示例：
+   ```Python
+   # 使用哈希算法比较密码
+   hashed_password = hash(password)
+   if hashed_password == stored_hashed_password:
+       return True
+   else:
+       return False
+   ```
 
 3. 命名规范
 
    变量命名：采用小写字母加下划线方式（snake_case）。
+   - 示例：
+   ```Python
+   def fetch_user_details(user_id: int):
+    pass
+   ```
    
    类命名：采用大写字母开头的驼峰式命名（CamelCase）。
+   - 示例：
+   ```Python
+   class UserAccount:
+    pass
+   ```
    
    函数命名：同变量命名规则，小写加下划线。
 
-4. 导入管理
+5. 导入管理
 
    标准库导入：放在最上方。
    
@@ -124,26 +148,88 @@
    
    本地模块导入：位于第三方库导入下方，并按逻辑分组。
 
-5. 异常处理
+   - 示例：
+   ```Python
+   import os
+   from datetime import datetime
+   
+   from fastapi import FastAPI, UploadFile, File
+   from fastapi.responses import FileResponse
+   from fastapi.staticfiles import StaticFiles
+   from sqlalchemy.orm import Session
+   
+   from . import crud, schemas
+   from .database import get_db
+   ```
+
+7. 异常处理
    
    捕获特定异常：避免使用except Exception as e，而应该尽量捕获具体的异常类型。
    
    异常信息记录：记录详细的异常信息，便于调试。
+   - 示例：
+   ```Python
+   def process_file(file: UploadFile) -> dict:
+    try:
+        # 处理文件逻辑
+        return {"status": "success"}
+    except FileNotFoundError:
+        return {"status": "error", "message": "指定文件未找到"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+   ```
 
-6. 接口设计
+9. 接口设计
 
    RESTful API：遵循RESTful原则设计API，使用恰当的HTTP动词。
    
    返回结构：统一返回结果的结构，如示例中的schemas.CustomResponse。
 
-7. 数据库操作
+   - 示例：
+   ```Python
+   from fastapi import APIRouter
+   router = APIRouter()
+   
+   @router.get("/users/{user_id}", response_model=schemas.User)
+   def read_user(user_id: int, db: Session = Depends(get_db)):
+       db_user = crud.get_user(db, user_id=user_id)
+       if db_user is None:
+           raise HTTPException(status_code=404, detail="User not found")
+       return db_user
+   ```
+
+11. 数据库操作
 
    会话管理：使用依赖注入管理数据库会话，如db: Session = Depends(get_db)。
    
    事务控制：对于涉及多个操作的业务逻辑，考虑使用事务保证数据一致性。
 
-8. 文件上传与处理
+   - 示例：
+   ```Python
+   from sqlalchemy.orm import Session
+   
+   def update_user(db: Session, user_id: int, new_data: schemas.UserUpdate):
+       db_user = crud.get_user(db, user_id=user_id)
+       if db_user is None:
+           raise HTTPException(status_code=404, detail="User not found")
+       # 更新用户信息
+       pass
+   ```
+
+11. 文件上传与处理
 
    路径构造：动态构造文件保存路径，确保路径合理且安全。
    
    文件保存：检查并创建必要目录后再保存文件。
+
+   - 示例：
+   ```Python
+   @app.post("/uploadfile/")
+   async def create_upload_file(file: UploadFile = File(...)):
+       # 构造保存路径
+       path = f"uploads/{datetime.now().strftime('%Y%m%d')}/{file.filename}"
+       # 保存文件
+       with open(path, "wb") as buffer:
+           buffer.write(await file.read())
+       return {"filename": file.filename}
+   ```
