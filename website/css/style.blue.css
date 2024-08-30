@@ -91,13 +91,14 @@ section {
   background-position: center center !important;
 }
 
-.dark-overlay {
+#2 .dark-overlay,
+#3 .dark-overlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.01);
   z-index: 1;
 }
 

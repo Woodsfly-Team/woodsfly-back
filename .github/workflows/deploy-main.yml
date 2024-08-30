@@ -6,11 +6,11 @@ on:
     types: [closed]
 
 jobs :
-  build:
+  Deploy:
     runs-on: ubuntu-latest
     steps:
 
-    - name: server_git_pull
+    - name: Deploy main to server
       uses: garygrossgarten/github-action-ssh@release
       with:
         command: ./cd_pull_main.sh
@@ -18,3 +18,5 @@ jobs :
         username: root
         port: 22
         privateKey: ${{ secrets.PRIVATE_KEY}}
+    - name: Success
+      run: echo "Deployed successfully!"
