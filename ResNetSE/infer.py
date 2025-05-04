@@ -3,7 +3,7 @@ from ResNetSE.macls.predict import MAClsPredictor
 #  获取识别器
 predictor = MAClsPredictor(
     configs="ResNetSE/configs/resnet_se.yml",
-    model_path="ResNetSE/models/ResNetSE_Fbank/best_model/",
+    model_path="ResNetSE/models/ResNetSE_Fbank/best_model_504/",
     use_gpu=False,
 )
 
